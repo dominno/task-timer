@@ -125,7 +125,7 @@ Dependencies: ARCH-002
 ---
 
 ## FEAT-002: Implement TaskSession Lifecycle Logic
-Status: In Progress
+Status: Completed
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: domain  
@@ -135,7 +135,7 @@ Dependencies: ARCH-003
 - [x] Implement pause, resume, stop logic in TaskSession
 - [x] Enforce valid state transitions
 - [x] Write unit tests (happy path, invalid transitions, clock abuse)
-- [ ] Status/log updates
+- [x] Status/log updates
 
 ### ✅ Acceptance Criteria
 1. TaskSession lifecycle logic passes all tests
@@ -149,16 +149,16 @@ Dependencies: ARCH-003
 ---
 
 ## FEAT-003: Implement CLI Command Logic (Start, Pause, Resume, Stop, Status)
-Status: Planned
+Status: In Progress
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: cli  
 Dependencies: ARCH-004, FEAT-001, FEAT-002
 
 ### 🔧 Implementation Plan
-- [ ] Implement each command to interact with domain and storage
-- [ ] Validate CLI args and error handling
-- [ ] Write unit tests (happy path, invalid input, storage errors)
+- [x] Implement each command to interact with domain and storage
+- [x] Validate CLI args and error handling
+- [x] Write unit tests (happy path, invalid input, storage errors)
 - [ ] Status/log updates
 
 ### ✅ Acceptance Criteria

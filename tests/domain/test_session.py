@@ -1,6 +1,6 @@
 import pytest
 from enum import Enum
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from freezegun import freeze_time
 
 # Attempt to import TaskSession and TaskSessionStatus
@@ -123,7 +123,7 @@ def test_pause_started_session():
     # Example: FROZEN_DATETIME is 12:00:00. initial_start_time is 11:50:00
     # A pause at 12:05:00 means segment was 15 mins.
     # Test below uses explicit start and pause relative to FROZEN_DATETIME.
-    initial_start_time_for_this_test = FROZEN_DATETIME # 12:00:00Z
+    initial_start_time_for_this_test = FROZEN_DATETIME  # 12:00:00Z
     session_for_pause = TaskSession(
         task_name="Pause Test", start_time=initial_start_time_for_this_test
     )
@@ -182,10 +182,10 @@ def test_pause_stopped_session_raises_error():
 def test_resume_paused_session():
     """Test resuming a PAUSED session."""
     # Setup a session that was started, ran for 5 mins, then paused.
-    initial_start_time = FROZEN_DATETIME - timedelta(minutes=10) # 11:50
+    initial_start_time = FROZEN_DATETIME - timedelta(minutes=10)  # 11:50
     session = TaskSession(task_name="Resume Test", start_time=initial_start_time)
-    
-    pause_time_for_setup = initial_start_time + timedelta(minutes=5) # 11:55
+
+    pause_time_for_setup = initial_start_time + timedelta(minutes=5)  # 11:55
     with freeze_time(pause_time_for_setup.isoformat().replace("+00:00", "Z")):
         session.pause()
         # At this point, status is PAUSED, _accumulated_duration is 5 mins.

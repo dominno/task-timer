@@ -6,16 +6,16 @@
 - Domain Model — TaskSession Entity & Lifecycle (ARCH-003)
 - CLI Command Routing Skeleton (ARCH-004)
 - Implement JSON Storage Provider (FEAT-001)
+- Implement TaskSession Lifecycle Logic (FEAT-002)
 
 ## In Progress
-- Implement TaskSession Lifecycle Logic (FEAT-002)
-  - ✅ Implement pause, resume, stop logic in TaskSession
-  - ✅ Enforce valid state transitions
-  - ✅ Write unit tests (happy path, invalid transitions, clock abuse)
+- Implement CLI Command Logic (Start, Pause, Resume, Stop, Status) (FEAT-003)
+  - ✅ Implement each command to interact with domain and storage
+  - ✅ Validate CLI args and error handling
+  - ✅ Write unit tests (happy path, invalid input, storage errors)
   - 🏗️ Status/log updates
 
 ## Pending
-- Implement CLI Command Logic (Start, Pause, Resume, Stop, Status) (FEAT-003)
 - Implement Summary Reporting (Today, Week, Month, Year) (FEAT-004)
 - Export Data to JSON/CSV (FEAT-005)
 - Enforce Unit Testing and Coverage Standards (TEST-001)
@@ -30,4 +30,4 @@
 - 2025-05-06 17:30 TECH-DEBT-001 — Deferred task 'Configure Flake8 and Black Alignment'. Rationale: Workaround (`flake8 --max-line-length=88`) is sufficient for now, allowing progress on core features. To be addressed before wider collaboration or CI integration. Alternatives: Implement immediately (would delay ARCH-003).
 
 ## Next Steps
-- Complete status/log updates for FEAT-002.
+- Complete status/log updates for FEAT-003.
