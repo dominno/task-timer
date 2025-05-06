@@ -1,5 +1,5 @@
 ## ARCH-001: Establish Project Architecture and Module Boundaries
-Status: In Progress
+Status: Completed
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: All (CLI, Domain, Infra)  
@@ -26,16 +26,16 @@ Dependencies: None
 ---
 
 ## ARCH-002: Define Storage Abstraction Layer (Strategy Pattern)
-Status: Planned
+Status: In Progress
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: infra/storage  
 Dependencies: ARCH-001
 
 ### 🔧 Implementation Plan
-- [ ] Define StorageProvider ABC in infra/storage/base.py
-- [ ] Document required interface methods
-- [ ] Add placeholder for JSON and SQLite implementations
+- [x] Define StorageProvider ABC in infra/storage/base.py
+- [x] Document required interface methods
+- [x] Add placeholder for JSON and SQLite implementations
 - [ ] Status/log updates
 
 ### ✅ Acceptance Criteria
@@ -61,6 +61,7 @@ Dependencies: ARCH-001
 - [ ] Add status Enum (STARTED, PAUSED, STOPPED)
 - [ ] Implement lifecycle methods: pause, resume, stop (no logic yet)
 - [ ] Document model fields and transitions
+- [ ] Update StorageProvider interface and implementations (JsonStorage, SQLiteStorage) with concrete TaskSession type hints, replacing Any.
 - [ ] Status/log updates
 
 ### ✅ Acceptance Criteria
@@ -240,3 +241,29 @@ Dependencies: All feature tasks
 ### 🧐 Edge Cases
 - Missed edge cases
 - Flaky or non-deterministic tests
+
+---
+
+## TECH-DEBT-001: Configure Flake8 and Black Alignment
+Status: Planned
+Priority: Low
+Architectural Module: Devops/Tooling
+Dependencies: None
+
+### 📝 Description
+Currently, `flake8` and `black` have different default line length configurations (79 vs 88 characters). This led to manual adjustments of the `flake8` command during ARCH-002. To ensure consistency and avoid future manual overrides:
+
+1.  Create a `.flake8` configuration file in the project root.
+2.  Set `max-line-length = 88` in `.flake8` to align with `black`'s default.
+3.  Consider adding other project-wide linting rules to this file as needed.
+4.  Ensure `black` is also configured consistently if its defaults are ever changed (e.g., via `pyproject.toml`).
+
+### ✅ Acceptance Criteria
+1.  `.flake8` configuration file exists.
+2.  `flake8` runs without `--max-line-length` argument and respects the 88 char limit.
+3.  `black` and `flake8` produce compatible formatting regarding line length.
+
+### 🧐 Impact
+- Improves developer experience by ensuring consistent linting.
+- Simplifies CI setup.
+- Reduces noise from conflicting linter/formatter defaults.

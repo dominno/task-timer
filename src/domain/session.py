@@ -1,1 +1,1 @@
-# Placeholder for TaskSession entity and logic 
+# Placeholder for TaskSession entity and logic

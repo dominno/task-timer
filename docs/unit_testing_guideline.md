@@ -62,7 +62,8 @@
 ## 8. Linting & Formatting
 
 - Test code must follow the same PEP8/PEP257 standards as production code.
-- Use `black` or `flake8` to lint test files.
+- Use `flake8` to lint test files. Install with `pip install flake8`.
+- Use `black` to format test files. Install with `pip install black`.
 
 ## 9. Running Tests
 

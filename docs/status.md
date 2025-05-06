@@ -1,19 +1,16 @@
 # Project Status
 
 ## Completed Features
-- [List of shipped features with brief descriptions]
+- Establish Project Architecture and Module Boundaries (ARCH-001)
 
 ## In Progress
-- Establish Project Architecture and Module Boundaries (ARCH-001)
-  - ✅ Create project folder structure as per architecture.mermaid
-  - ✅ Scaffold empty modules: cli, domain, infra/storage
-  - ✅ Add placeholder files for each module/component
-  - ✅ Document module boundaries and responsibilities
-  - ✅ Add README with architecture diagram reference
-  - ✅ Status/log updates
+- Define Storage Abstraction Layer (Strategy Pattern) (ARCH-002)
+  - ✅ Define StorageProvider ABC in infra/storage/base.py
+  - ✅ Document required interface methods
+  - ✅ Add placeholder for JSON and SQLite implementations
+  - 🏗️ Status/log updates
 
 ## Pending
-- Define Storage Abstraction Layer (Strategy Pattern) (ARCH-002)
 - Domain Model — TaskSession Entity & Lifecycle (ARCH-003)
 - CLI Command Routing Skeleton (ARCH-004)
 - Implement JSON Storage Provider (FEAT-001)
@@ -23,12 +20,12 @@
 - Export Data to JSON/CSV (FEAT-005)
 - Enforce Unit Testing and Coverage Standards (TEST-001)
 
-
 ## Known Issues
 - [Issue ID or description, optional link to bug/task]
 
 ## Decision History
 - 2025-05-06 17:14 ARCH-001 — Initial project structure and scaffolding completed as per architecture.mermaid and technical.md. Alternatives considered: None, followed defined plan.
+- 2025-05-06 17:30 TECH-DEBT-001 — Deferred task 'Configure Flake8 and Black Alignment'. Rationale: Workaround (`flake8 --max-line-length=88`) is sufficient for now, allowing progress on core features. To be addressed before wider collaboration or CI integration. Alternatives: Implement immediately (would delay ARCH-003).
 
 ## Next Steps
-- Review DEFINITION_OF_DONE for ARCH-001.
+- Complete status/log updates for ARCH-002.

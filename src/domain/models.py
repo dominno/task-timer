@@ -1,1 +1,1 @@
-# Placeholder for Domain models 
+# Placeholder for Domain models
