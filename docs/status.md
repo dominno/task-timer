@@ -2,16 +2,18 @@
 
 ## Completed Features
 - Establish Project Architecture and Module Boundaries (ARCH-001)
+- Define Storage Abstraction Layer (Strategy Pattern) (ARCH-002)
 
 ## In Progress
-- Define Storage Abstraction Layer (Strategy Pattern) (ARCH-002)
-  - ✅ Define StorageProvider ABC in infra/storage/base.py
-  - ✅ Document required interface methods
-  - ✅ Add placeholder for JSON and SQLite implementations
+- Domain Model — TaskSession Entity & Lifecycle (ARCH-003)
+  - ✅ Define TaskSession model in domain/session.py
+  - ✅ Add status Enum (STARTED, PAUSED, STOPPED)
+  - ✅ Implement lifecycle methods: pause, resume, stop (no logic yet)
+  - ✅ Document model fields and transitions
+  - ✅ Update StorageProvider interface and implementations with TaskSession type hints
   - 🏗️ Status/log updates
 
 ## Pending
-- Domain Model — TaskSession Entity & Lifecycle (ARCH-003)
 - CLI Command Routing Skeleton (ARCH-004)
 - Implement JSON Storage Provider (FEAT-001)
 - Implement TaskSession Lifecycle Logic (FEAT-002)
@@ -28,4 +30,4 @@
 - 2025-05-06 17:30 TECH-DEBT-001 — Deferred task 'Configure Flake8 and Black Alignment'. Rationale: Workaround (`flake8 --max-line-length=88`) is sufficient for now, allowing progress on core features. To be addressed before wider collaboration or CI integration. Alternatives: Implement immediately (would delay ARCH-003).
 
 ## Next Steps
-- Complete status/log updates for ARCH-002.
+- Complete status/log updates for ARCH-003.

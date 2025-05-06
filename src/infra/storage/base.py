@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import (
-    List,
-    Any,
-)  # Changed from list to List for older Pythons if needed, Any for session type
+from typing import List
+
+# Import TaskSession for type hinting
+from src.domain.session import TaskSession  # Adjusted path assuming domain.session
 
 # Forward declaration for type hinting TaskSession if it's in a different module
 # to avoid circular imports. This is a common pattern.
@@ -19,9 +19,7 @@ class StorageProvider(ABC):
     """
 
     @abstractmethod
-    def save_task_session(
-        self, session: Any
-    ) -> None:  # TODO: Replace Any with TaskSession once defined
+    def save_task_session(self, session: TaskSession) -> None:
         """Saves a single task session.
 
         Args:
@@ -30,9 +28,7 @@ class StorageProvider(ABC):
         pass
 
     @abstractmethod
-    def get_all_sessions(
-        self,
-    ) -> List[Any]:  # TODO: Replace Any with TaskSession once defined
+    def get_all_sessions(self) -> List[TaskSession]:
         """Retrieves all task sessions.
 
         Returns:

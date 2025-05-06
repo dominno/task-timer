@@ -26,7 +26,7 @@ Dependencies: None
 ---
 
 ## ARCH-002: Define Storage Abstraction Layer (Strategy Pattern)
-Status: In Progress
+Status: Completed
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: infra/storage  
@@ -36,7 +36,7 @@ Dependencies: ARCH-001
 - [x] Define StorageProvider ABC in infra/storage/base.py
 - [x] Document required interface methods
 - [x] Add placeholder for JSON and SQLite implementations
-- [ ] Status/log updates
+- [x] Status/log updates
 
 ### ✅ Acceptance Criteria
 1. StorageProvider ABC exists with all required methods
@@ -50,18 +50,18 @@ Dependencies: ARCH-001
 ---
 
 ## ARCH-003: Domain Model — TaskSession Entity & Lifecycle
-Status: Planned  
+Status: In Progress
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: domain  
 Dependencies: ARCH-001
 
 ### 🔧 Implementation Plan
-- [ ] Define TaskSession model in domain/session.py
-- [ ] Add status Enum (STARTED, PAUSED, STOPPED)
-- [ ] Implement lifecycle methods: pause, resume, stop (no logic yet)
-- [ ] Document model fields and transitions
-- [ ] Update StorageProvider interface and implementations (JsonStorage, SQLiteStorage) with concrete TaskSession type hints, replacing Any.
+- [x] Define TaskSession model in domain/session.py
+- [x] Add status Enum (STARTED, PAUSED, STOPPED)
+- [x] Implement lifecycle methods: pause, resume, stop (no logic yet)
+- [x] Document model fields and transitions
+- [x] Update StorageProvider interface and implementations (JsonStorage, SQLiteStorage) with concrete TaskSession type hints, replacing Any.
 - [ ] Status/log updates
 
 ### ✅ Acceptance Criteria
@@ -267,3 +267,36 @@ Currently, `flake8` and `black` have different default line length configuration
 - Improves developer experience by ensuring consistent linting.
 - Simplifies CI setup.
 - Reduces noise from conflicting linter/formatter defaults.
+
+---
+
+## FEAT-IMPRV-001: Add TaskSession.create_from_json factory method
+Status: Planned
+Priority: Low
+Architectural Module: domain
+Dependencies: FEAT-001
+PRD Reference: None (Internal improvement suggested during ARCH-003 review)
+
+### 📝 Description
+As a forward-thinking measure suggested during the review of ARCH-003, implement a class method `TaskSession.create_from_json(cls, data: dict) -> TaskSession`.
+
+This method will be responsible for deserializing a dictionary (presumably from a JSON object) into a `TaskSession` instance.
+
+This task should be tackled after or alongside FEAT-001 (Implement JSON Storage Provider) as it directly relates to how `TaskSession` objects are reconstructed from JSON data.
+
+### 🔧 Implementation Plan
+- [ ] Define the signature for `TaskSession.create_from_json(cls, data: dict) -> TaskSession`.
+- [ ] Implement basic deserialization logic (handle `task_name`, `start_time`, `end_time`, `status`, `_duration_override`).
+- [ ] Ensure proper type conversion (e.g., ISO date strings to datetime objects).
+- [ ] Write unit tests for various valid and invalid input data scenarios.
+
+### ✅ Acceptance Criteria
+1. `TaskSession.create_from_json` method is implemented.
+2. Method correctly deserializes valid dictionary representations of a `TaskSession`.
+3. Method handles potential errors or missing keys gracefully (e.g., raises ValueError, or has clear default logic).
+4. Unit tests cover main success and failure paths.
+
+### 🧐 Impact
+- Encapsulates deserialization logic within the domain model.
+- Improves maintainability when JSON structure or TaskSession model evolves.
+- Provides a clear interface for reconstructing TaskSession objects from storage.

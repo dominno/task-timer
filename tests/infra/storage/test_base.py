@@ -4,16 +4,18 @@ from abc import ABC
 # Attempt to import the StorageProvider
 try:
     from src.infra.storage.base import StorageProvider
+    from src.domain.session import TaskSession
 except ImportError:
     StorageProvider = None  # type: ignore
+    TaskSession = None  # type: ignore
 
 
 # A concrete implementation for testing purposes
 class ConcreteStorageProvider(StorageProvider):
-    def save_task_session(self, session) -> None:
+    def save_task_session(self, session: TaskSession) -> None:
         pass
 
-    def get_all_sessions(self) -> list:
+    def get_all_sessions(self) -> list[TaskSession]:  # Use list[TaskSession]
         return []
 
     def clear(self) -> None:
@@ -49,9 +51,10 @@ def test_storage_provider_has_abstract_methods():
     """Tests that StorageProvider declares the required abstract methods."""
     expected_abstract_methods = {"save_task_session", "get_all_sessions", "clear"}
     actual_abstract_methods = StorageProvider.__abstractmethods__
-    assert actual_abstract_methods == expected_abstract_methods, \
-        (f"Expected abstract methods {expected_abstract_methods}, "
-         f"got {actual_abstract_methods}")
+    assert actual_abstract_methods == expected_abstract_methods, (
+        f"Expected abstract methods {expected_abstract_methods}, "
+        f"got {actual_abstract_methods}"
+    )
 
 
 @pytest.mark.skipif(
@@ -76,7 +79,7 @@ def test_incomplete_provider_raises_type_error():
     """Tests that an incomplete concrete provider raises TypeError on instantiation."""
 
     class IncompleteProvider(StorageProvider):
-        def save_task_session(self, session) -> None:
+        def save_task_session(self, session: TaskSession) -> None:  # Use TaskSession
             pass
 
         # Missing get_all_sessions and clear
