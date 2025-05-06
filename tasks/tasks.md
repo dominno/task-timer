@@ -50,7 +50,7 @@ Dependencies: ARCH-001
 ---
 
 ## ARCH-003: Domain Model — TaskSession Entity & Lifecycle
-Status: In Progress
+Status: Completed
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: domain  
@@ -62,7 +62,7 @@ Dependencies: ARCH-001
 - [x] Implement lifecycle methods: pause, resume, stop (no logic yet)
 - [x] Document model fields and transitions
 - [x] Update StorageProvider interface and implementations (JsonStorage, SQLiteStorage) with concrete TaskSession type hints, replacing Any.
-- [ ] Status/log updates
+- [x] Status/log updates
 
 ### ✅ Acceptance Criteria
 1. TaskSession model and Enum defined
@@ -76,17 +76,17 @@ Dependencies: ARCH-001
 ---
 
 ## ARCH-004: CLI Command Routing Skeleton
-Status: Planned  
+Status: In Progress
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: cli  
 Dependencies: ARCH-001
 
 ### 🔧 Implementation Plan
-- [ ] Create main.py entry point
-- [ ] Define Command ABC in cli/command_base.py
-- [ ] Scaffold command files: start, pause, resume, stop, status, summary
-- [ ] Implement command dispatcher skeleton
+- [x] Create main.py entry point
+- [x] Define Command ABC in cli/command_base.py
+- [x] Scaffold command files: start, pause, resume, stop, status, summary
+- [x] Implement command dispatcher skeleton
 - [ ] Status/log updates
 
 ### ✅ Acceptance Criteria

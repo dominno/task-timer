@@ -13,3 +13,6 @@
 2025-05-06 17:33 - ARCH-003 - Wrote tests for TaskSession model and TaskSessionStatus Enum. Implemented them in src/domain/session.py. Used typing.Optional for Python 3.9 compatibility. Tests pass.
 2025-05-06 17:33 - ARCH-003 - Enhanced TaskSession docstring with field details and state transitions.
 2025-05-06 17:33 - ARCH-003 - Updated StorageProvider interface and its implementations (JsonStorage, SQLiteStorage, and test_base.py) to use concrete TaskSession type hints. Next step: Complete ARCH-003 checklist.
+2025-05-06 17:41 - ARCH-003 - Linted and formatted code. All checks pass. Completed all checklist items and acceptance criteria. Reviewed DEFINITION_OF_DONE. Merged feature/ARCH-003-domain-model-tasksession-entity-lifecycle to develop. Task ARCH-003 complete. Next task: ARCH-004.
+2025-05-06 17:42 - ARCH-004 - Started task. Created feature branch feature/ARCH-004-cli-command-routing-skeleton.
+2025-05-06 17:42 - ARCH-004 - Verified pre-existing command files and Command ABC. Wrote tests for command dispatcher in src/main.py. Implemented dispatcher. Tests pass. Next step: Complete ARCH-004 checklist.
