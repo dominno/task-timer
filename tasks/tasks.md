@@ -101,7 +101,7 @@ Dependencies: ARCH-001
 ---
 
 ## FEAT-001: Implement JSON Storage Provider
-Status: In Progress
+Status: Completed
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: infra/storage  
@@ -111,7 +111,7 @@ Dependencies: ARCH-002
 - [x] Implement JsonStorage class with save_task_session/get_all_sessions/clear
 - [x] Handle file I/O and error cases
 - [x] Write unit tests (happy path, file corruption, permission error)
-- [ ] Status/log updates
+- [x] Status/log updates
 
 ### ✅ Acceptance Criteria
 1. JsonStorage passes all tests
@@ -125,16 +125,16 @@ Dependencies: ARCH-002
 ---
 
 ## FEAT-002: Implement TaskSession Lifecycle Logic
-Status: Planned  
+Status: In Progress
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: domain  
 Dependencies: ARCH-003
 
 ### 🔧 Implementation Plan
-- [ ] Implement pause, resume, stop logic in TaskSession
-- [ ] Enforce valid state transitions
-- [ ] Write unit tests (happy path, invalid transitions, clock abuse)
+- [x] Implement pause, resume, stop logic in TaskSession
+- [x] Enforce valid state transitions
+- [x] Write unit tests (happy path, invalid transitions, clock abuse)
 - [ ] Status/log updates
 
 ### ✅ Acceptance Criteria

@@ -54,18 +54,94 @@ The concrete implementation will be injected at runtime using a factory method o
 
 - Core domain entity: `TaskSession`
   - `task_name: str`
-  - `start_time: datetime`
-  - `end_time: datetime | None`
-  - `duration: timedelta`
+  - `start_time: datetime` (Overall start of the session)
+  - `end_time: Optional[datetime]` (Overall end of the session, set when stopped)
   - `status: Enum(STARTED, PAUSED, STOPPED)`
+  - `_accumulated_duration: timedelta` (Internal: Stores duration from completed segments before a pause)
+  - `_current_segment_start_time: Optional[datetime]` (Internal: Time current active segment started, or None if paused/stopped)
+  - `duration: timedelta` (Calculated property, see lifecycle logic)
 
 Business logic should **only operate on this model**. No timestamps, file paths, or CLI args should be passed into domain logic directly. All mutation is done through clearly named methods:
 
 ```python
+# Example of how TaskSession might be structured internally
+# (actual implementation in src/domain/session.py)
+
+# from datetime import datetime, timedelta
+# from enum import Enum
+# from dataclasses import dataclass, field
+
+# class TaskSessionStatus(Enum):
+#     STARTED = "STARTED"
+#     PAUSED = "PAUSED"
+#     STOPPED = "STOPPED"
+
+# @dataclass
+# class TaskSession:
+#     task_name: str
+#     start_time: datetime
+#     end_time: Optional[datetime] = None
+#     status: TaskSessionStatus = TaskSessionStatus.STARTED
+#     _accumulated_duration: timedelta = field(default_factory=timedelta)
+#     _current_segment_start_time: Optional[datetime] = field(init=False, default=None)
+
+#     def __post_init__(self):
+#         if self.status == TaskSessionStatus.STARTED:
+#             self._current_segment_start_time = self.start_time
+
+#     @property
+#     def duration(self) -> timedelta:
+#         current_segment_duration = timedelta(0)
+#         if self.status == TaskSessionStatus.STARTED and self._current_segment_start_time:
+#             current_segment_duration = datetime.now() - self._current_segment_start_time # Or use timezone.now()
+#         return self._accumulated_duration + current_segment_duration
+
+#     def pause(self) -> None:
+#         if self.status == TaskSessionStatus.STARTED and self._current_segment_start_time:
+#             self._accumulated_duration += (datetime.now() - self._current_segment_start_time)
+#         self.status = TaskSessionStatus.PAUSED
+#         self._current_segment_start_time = None
+
+#     def resume(self) -> None:
+#         if self.status == TaskSessionStatus.PAUSED:
+#             self.status = TaskSessionStatus.STARTED
+#             self._current_segment_start_time = datetime.now()
+
+#     def stop(self) -> None:
+#         if self.status == TaskSessionStatus.STARTED and self._current_segment_start_time:
+#             self._accumulated_duration += (datetime.now() - self._current_segment_start_time)
+#         self.end_time = datetime.now()
+#         self.status = TaskSessionStatus.STOPPED
+#         self._current_segment_start_time = None
+
+# Example usage:
 session.pause()
 session.resume()
 session.stop()
 ```
+
+**Lifecycle and Duration Calculation for `TaskSession`:**
+-   A new `TaskSession` is initialized with `status = STARTED`, `_accumulated_duration = timedelta(0)`, and `_current_segment_start_time = start_time`.
+-   **`pause()` method:**
+    -   If `status` is `STARTED`: Calculates the duration of the current active segment (e.g., `datetime.now() - _current_segment_start_time`) and adds it to `_accumulated_duration`.
+    -   Sets `status` to `PAUSED`.
+    -   Sets `_current_segment_start_time` to `None`.
+    -   Throws an error if already `PAUSED` or `STOPPED`.
+-   **`resume()` method:**
+    -   If `status` is `PAUSED`: Sets `status` to `STARTED`.
+    -   Sets `_current_segment_start_time` to `datetime.now()`.
+    -   Throws an error if already `STARTED` or `STOPPED`.
+-   **`stop()` method:**
+    -   If `status` is `STARTED`: Calculates the duration of the current active segment and adds it to `_accumulated_duration`.
+    -   Sets `end_time` to `datetime.now()`.
+    -   Sets `status` to `STOPPED`.
+    -   Sets `_current_segment_start_time` to `None`.
+    -   Throws an error if already `STOPPED`.
+-   **`duration` property (read-only):**
+    -   If `status` is `STARTED` and `_current_segment_start_time` is set: Returns `_accumulated_duration + (datetime.now() - _current_segment_start_time)`. This provides a live duration.
+    -   If `status` is `PAUSED`: Returns `_accumulated_duration`.
+    -   If `status` is `STOPPED`: Returns `_accumulated_duration` (which at this point represents the total active time).
+    -   Note: For time calculations, consistently use timezone-aware `datetime` objects, preferably UTC for internal storage and calculations, converting to local time only for display. The `freezegun` library will be essential for testing time-dependent logic.
 
 > ✅ SOLID: SRP is enforced  
 > ✅ DRY: Shared lifecycle logic resides in domain, not CLI or storage  

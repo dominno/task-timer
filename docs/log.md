@@ -21,3 +21,9 @@
 2025-05-06 19:04 - FEAT-001 - Created initial stub tests for JsonStorage. Modified JsonStorage.__init__ to accept file_path. Stub tests pass.
 2025-05-06 19:04 - FEAT-001 - Added tests for save/get single and multiple sessions. Implemented JsonStorage save/load logic with helpers for dict conversion. Tests pass.
 2025-05-06 19:04 - FEAT-001 - Removed problematic save_task_session_stub test. Added tests for corrupted JSON and mocked I/O errors for read/write. Updated JsonStorage to handle IOError on load. All JsonStorage tests pass. Next step: Complete FEAT-001 checklist.
+2025-05-07 00:20 - FEAT-001 - Linted (fixed E501, F841 acceptable) and formatted code. Implemented StorageWriteError. Completed all checklist items and acceptance criteria. Reviewed DEFINITION_OF_DONE. Merged feature/FEAT-001-implement-json-storage-provider to develop. Task FEAT-001 complete. Next task: FEAT-002.
+2025-05-07 00:32 - FEAT-002 - Started task. Created feature branch feature/FEAT-002-implement-tasksession-lifecycle-logic.
+2025-05-07 00:32 - FEAT-002 - Updated docs/technical.md with segmented accumulation design for TaskSession duration. Updated TaskSession model with new internal fields, __post_init__, and duration property. Installed freezegun. Updated tests for new model structure; tests pass.
+2025-05-07 00:32 - FEAT-002 - Implemented TaskSession.pause() with tests for valid/invalid transitions. Tests pass.
+2025-05-07 00:32 - FEAT-002 - Implemented TaskSession.resume() with tests for valid/invalid transitions. Tests pass.
+2025-05-07 00:32 - FEAT-002 - Implemented TaskSession.stop() with tests for valid/invalid transitions. Tests pass. Next step: Complete FEAT-002 checklist.

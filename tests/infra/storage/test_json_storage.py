@@ -9,7 +9,10 @@ from datetime import datetime, timedelta, timezone
 try:
     from src.infra.storage.json_storage import JsonStorage
     from src.domain.session import TaskSession, TaskSessionStatus
-    from src.infra.storage.base import StorageProvider, StorageWriteError  # To check inheritance and import StorageWriteError
+    from src.infra.storage.base import (
+        StorageProvider,
+        StorageWriteError,
+    )  # To check inheritance and import StorageWriteError
 except ImportError:
     JsonStorage = None  # type: ignore
     TaskSession = None  # type: ignore
@@ -181,10 +184,12 @@ def test_save_sessions_handles_io_error_on_write(mock_open_file, temp_json_stora
     if start_time.tzinfo is not None:
         start_time = start_time.astimezone(timezone.utc).replace(tzinfo=None)
     session_to_save = TaskSession(task_name="Test IO Error", start_time=start_time)
-    
-    with pytest.raises(StorageWriteError, match=r"Failed to write sessions to .*?: Disk full"):
+
+    with pytest.raises(
+        StorageWriteError, match=r"Failed to write sessions to .*?: Disk full"
+    ):
         temp_json_storage._save_sessions_to_file([session_to_save])
-    mock_open_file.assert_called_once_with(temp_json_storage.file_path, 'w')
+    mock_open_file.assert_called_once_with(temp_json_storage.file_path, "w")
 
 
 # Further tests for actual file I/O, error handling, etc., will be added incrementally.

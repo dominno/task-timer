@@ -31,7 +31,9 @@ def session_to_dict(session: TaskSession) -> Dict[str, Any]:
 def dict_to_session(data: Dict[str, Any]) -> TaskSession:
     """Converts a dictionary (from JSON) back to a TaskSession object."""
     start_time_str = data.get("start_time")
-    data["start_time"] = datetime.fromisoformat(start_time_str) if start_time_str else None  # noqa: E501
+    data["start_time"] = (
+        datetime.fromisoformat(start_time_str) if start_time_str else None
+    )  # noqa: E501
     end_time_str = data.get("end_time")
     data["end_time"] = datetime.fromisoformat(end_time_str) if end_time_str else None
     data["status"] = TaskSessionStatus(data["status"])  # Recreate enum from value
@@ -87,7 +89,9 @@ class JsonStorage(StorageProvider):
                 json.dump(data_list, f, indent=4)
         except IOError as e:
             # print(f"Error writing to JSON file: {e}") # For debugging
-            raise StorageWriteError(f"Failed to write sessions to {self.file_path}: {e}") from e
+            raise StorageWriteError(
+                f"Failed to write sessions to {self.file_path}: {e}"
+            ) from e
 
     def save_task_session(self, session: TaskSession) -> None:
         sessions = self._load_sessions_from_file()

@@ -1,7 +1,7 @@
 # Placeholder for TaskSession entity and logic
 
 from enum import Enum
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -14,23 +14,29 @@ class TaskSessionStatus(Enum):
     STOPPED = "STOPPED"
 
 
+class InvalidStateTransitionError(Exception):
+    """Raised when a lifecycle method is called on a session in an invalid state."""
+
+    pass
+
+
 @dataclass
 class TaskSession:
     """Represents a single task tracking session.
 
     Attributes:
         task_name (str): The name or description of the task.
-        start_time (datetime): The time when the session started.
-        end_time (Optional[datetime]): The time when the session ended. None if
-            ongoing or paused.
+        start_time (datetime): The overall start time when the session was created.
+        end_time (Optional[datetime]): The overall end time when the session was stopped.
+                                     None if ongoing or paused.
         status (TaskSessionStatus): The current status of the session (STARTED,
-            PAUSED, STOPPED).
-        duration (timedelta): Calculated duration. If not STOPPED, behavior may be
-            refined. If not ended, defaults to timedelta(0) unless overridden.
-        _duration_override (Optional[timedelta]): Allows explicitly setting duration,
-            bypassing calculation. Useful for importing data.
+                                  PAUSED, STOPPED).
+        _accumulated_duration (timedelta): Internal: Stores duration from completed segments.
+        _current_segment_start_time (Optional[datetime]): Internal: Time current active
+                                                       segment started, or None.
+        duration (timedelta): Calculated total active duration of the session.
 
-    State Transitions (managed by lifecycle methods - to be implemented):
+    State Transitions (managed by lifecycle methods):
         - A new session starts in STARTED status.
         - STARTED -> PAUSED (via pause())
         - PAUSED -> STARTED (via resume())
@@ -42,33 +48,83 @@ class TaskSession:
     start_time: datetime
     end_time: Optional[datetime] = None
     status: TaskSessionStatus = TaskSessionStatus.STARTED
-    # Using field for default_factory to ensure new timedelta for each instance
-    _duration_override: Optional[timedelta] = field(
-        default=None, repr=False
-    )  # For specific cases like data import
+    _accumulated_duration: timedelta = field(default_factory=timedelta, init=False)
+    _current_segment_start_time: Optional[datetime] = field(init=False, default=None)
+
+    def __post_init__(self):
+        if not isinstance(self.start_time, datetime):
+            raise TypeError("start_time must be a datetime object")
+        
+        # Normalize start_time to UTC
+        if self.start_time.tzinfo is None: # If naive, assume UTC
+            self.start_time = self.start_time.replace(tzinfo=timezone.utc)
+        elif self.start_time.tzinfo != timezone.utc: # If aware but not UTC, convert
+            self.start_time = self.start_time.astimezone(timezone.utc)
+        
+        if self.end_time is not None:
+            if not isinstance(self.end_time, datetime):
+                raise TypeError("end_time must be a datetime object or None")
+            # Normalize end_time to UTC
+            if self.end_time.tzinfo is None:
+                self.end_time = self.end_time.replace(tzinfo=timezone.utc)
+            elif self.end_time.tzinfo != timezone.utc:
+                self.end_time = self.end_time.astimezone(timezone.utc)
+
+        if self.status == TaskSessionStatus.STARTED:
+            self._current_segment_start_time = self.start_time # Now guaranteed UTC
+        elif self.status == TaskSessionStatus.STOPPED and self.end_time is not None:
+            if self.start_time > self.end_time:
+                 raise ValueError("end_time cannot be before start_time")
+            self._accumulated_duration = self.end_time - self.start_time
+            self._current_segment_start_time = None
+        elif self.status == TaskSessionStatus.PAUSED:
+            self._current_segment_start_time = None
 
     @property
     def duration(self) -> timedelta:
-        if self._duration_override is not None:
-            return self._duration_override
-        if self.end_time:
-            return self.end_time - self.start_time
-        # If not stopped/paused, duration is from start_time to now.
-        # Behavior might be refined later for PAUSED state.
-        # For now, if active, duration might be ongoing or zero until stopped.
-        # Assume duration is mainly for completed/explicit periods.
-        # Or, if ongoing, calculate to now. PRD implies duration for completed.
-        # Simple model: if not ended, duration is zero unless overridden.
-        # Consider if active session should show running duration.
-        # Match test_task_session_creation_defaults (expects 0 if not ended).
-        return timedelta(0)
+        current_segment_duration = timedelta(0)
+        if self.status == TaskSessionStatus.STARTED and self._current_segment_start_time:
+            now = datetime.now(timezone.utc)
+            # _current_segment_start_time is now guaranteed to be UTC
+            current_segment_duration = now - self._current_segment_start_time
+        return self._accumulated_duration + current_segment_duration
 
-    # Placeholder for lifecycle methods to be implemented next
     def pause(self) -> None:
-        pass
+        """Pauses an active (STARTED) session."""
+        if self.status == TaskSessionStatus.PAUSED:
+            raise InvalidStateTransitionError("Cannot pause a session that is already PAUSED.")
+        if self.status == TaskSessionStatus.STOPPED:
+            raise InvalidStateTransitionError("Cannot pause a session that is already STOPPED.")
+        
+        if self.status == TaskSessionStatus.STARTED and self._current_segment_start_time:
+            now = datetime.now(timezone.utc)
+            # _current_segment_start_time is now guaranteed to be UTC
+            self._accumulated_duration += (now - self._current_segment_start_time)
+        
+        self.status = TaskSessionStatus.PAUSED
+        self._current_segment_start_time = None
 
     def resume(self) -> None:
-        pass
+        """Resumes a PAUSED session."""
+        if self.status == TaskSessionStatus.STARTED:
+            raise InvalidStateTransitionError("Cannot resume a session that is already STARTED.")
+        if self.status == TaskSessionStatus.STOPPED:
+            raise InvalidStateTransitionError("Cannot resume a session that is already STOPPED.")
+        
+        self.status = TaskSessionStatus.STARTED
+        self._current_segment_start_time = datetime.now(timezone.utc) # This is UTC
 
     def stop(self) -> None:
-        pass
+        """Stops an active (STARTED) or PAUSED session."""
+        if self.status == TaskSessionStatus.STOPPED:
+            raise InvalidStateTransitionError("Cannot stop a session that is already STOPPED.")
+
+        now = datetime.now(timezone.utc)
+
+        if self.status == TaskSessionStatus.STARTED and self._current_segment_start_time:
+            # _current_segment_start_time is now guaranteed to be UTC
+            self._accumulated_duration += (now - self._current_segment_start_time)
+        
+        self.end_time = now # This is UTC
+        self.status = TaskSessionStatus.STOPPED
+        self._current_segment_start_time = None
