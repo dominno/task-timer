@@ -16,3 +16,8 @@
 2025-05-06 17:41 - ARCH-003 - Linted and formatted code. All checks pass. Completed all checklist items and acceptance criteria. Reviewed DEFINITION_OF_DONE. Merged feature/ARCH-003-domain-model-tasksession-entity-lifecycle to develop. Task ARCH-003 complete. Next task: ARCH-004.
 2025-05-06 17:42 - ARCH-004 - Started task. Created feature branch feature/ARCH-004-cli-command-routing-skeleton.
 2025-05-06 17:42 - ARCH-004 - Verified pre-existing command files and Command ABC. Wrote tests for command dispatcher in src/main.py. Implemented dispatcher. Tests pass. Next step: Complete ARCH-004 checklist.
+2025-05-06 17:43 - ARCH-004 - Linted and formatted code. All checks pass. Completed all checklist items and acceptance criteria. Reviewed DEFINITION_OF_DONE. Merged feature/ARCH-004-cli-command-routing-skeleton to develop. Task ARCH-004 complete. Next task: FEAT-001.
+2025-05-06 19:04 - FEAT-001 - Started task. Created feature branch feature/FEAT-001-implement-json-storage-provider.
+2025-05-06 19:04 - FEAT-001 - Created initial stub tests for JsonStorage. Modified JsonStorage.__init__ to accept file_path. Stub tests pass.
+2025-05-06 19:04 - FEAT-001 - Added tests for save/get single and multiple sessions. Implemented JsonStorage save/load logic with helpers for dict conversion. Tests pass.
+2025-05-06 19:04 - FEAT-001 - Removed problematic save_task_session_stub test. Added tests for corrupted JSON and mocked I/O errors for read/write. Updated JsonStorage to handle IOError on load. All JsonStorage tests pass. Next step: Complete FEAT-001 checklist.

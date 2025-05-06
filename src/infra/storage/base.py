@@ -43,3 +43,11 @@ class StorageProvider(ABC):
         This is typically used for testing or resetting the application state.
         """
         pass
+
+class StorageError(Exception):
+    """Base class for storage-related errors."""
+    pass
+
+class StorageWriteError(StorageError):
+    """Raised when an error occurs during a storage write operation."""
+    pass

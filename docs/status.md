@@ -4,17 +4,16 @@
 - Establish Project Architecture and Module Boundaries (ARCH-001)
 - Define Storage Abstraction Layer (Strategy Pattern) (ARCH-002)
 - Domain Model — TaskSession Entity & Lifecycle (ARCH-003)
+- CLI Command Routing Skeleton (ARCH-004)
 
 ## In Progress
-- CLI Command Routing Skeleton (ARCH-004)
-  - ✅ Create main.py entry point
-  - ✅ Define Command ABC in cli/command_base.py
-  - ✅ Scaffold command files: start, pause, resume, stop, status, summary
-  - ✅ Implement command dispatcher skeleton
+- Implement JSON Storage Provider (FEAT-001)
+  - ✅ Implement JsonStorage class with save_task_session/get_all_sessions/clear
+  - ✅ Handle file I/O and error cases
+  - ✅ Write unit tests (happy path, file corruption, permission error)
   - 🏗️ Status/log updates
 
 ## Pending
-- Implement JSON Storage Provider (FEAT-001)
 - Implement TaskSession Lifecycle Logic (FEAT-002)
 - Implement CLI Command Logic (Start, Pause, Resume, Stop, Status) (FEAT-003)
 - Implement Summary Reporting (Today, Week, Month, Year) (FEAT-004)
@@ -30,4 +29,4 @@
 - 2025-05-06 17:30 TECH-DEBT-001 — Deferred task 'Configure Flake8 and Black Alignment'. Rationale: Workaround (`flake8 --max-line-length=88`) is sufficient for now, allowing progress on core features. To be addressed before wider collaboration or CI integration. Alternatives: Implement immediately (would delay ARCH-003).
 
 ## Next Steps
-- Complete status/log updates for ARCH-004.
+- Complete status/log updates for FEAT-001.

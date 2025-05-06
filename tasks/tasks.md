@@ -76,7 +76,7 @@ Dependencies: ARCH-001
 ---
 
 ## ARCH-004: CLI Command Routing Skeleton
-Status: In Progress
+Status: Completed
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: cli  
@@ -87,7 +87,7 @@ Dependencies: ARCH-001
 - [x] Define Command ABC in cli/command_base.py
 - [x] Scaffold command files: start, pause, resume, stop, status, summary
 - [x] Implement command dispatcher skeleton
-- [ ] Status/log updates
+- [x] Status/log updates
 
 ### ✅ Acceptance Criteria
 1. CLI entry point and dispatcher exist
@@ -101,16 +101,16 @@ Dependencies: ARCH-001
 ---
 
 ## FEAT-001: Implement JSON Storage Provider
-Status: Planned  
+Status: In Progress
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: infra/storage  
 Dependencies: ARCH-002
 
 ### 🔧 Implementation Plan
-- [ ] Implement JsonStorage class with save/load/clear
-- [ ] Handle file I/O and error cases
-- [ ] Write unit tests (happy path, file corruption, permission error)
+- [x] Implement JsonStorage class with save_task_session/get_all_sessions/clear
+- [x] Handle file I/O and error cases
+- [x] Write unit tests (happy path, file corruption, permission error)
 - [ ] Status/log updates
 
 ### ✅ Acceptance Criteria
@@ -300,3 +300,35 @@ This task should be tackled after or alongside FEAT-001 (Implement JSON Storage 
 - Encapsulates deserialization logic within the domain model.
 - Improves maintainability when JSON structure or TaskSession model evolves.
 - Provides a clear interface for reconstructing TaskSession objects from storage.
+
+---
+
+## FEAT-IMPRV-002: Implement Robust Logging in Storage Layer
+Status: Planned
+Priority: Low
+Architectural Module: infra/storage
+Dependencies: FEAT-001
+PRD Reference: None (Internal improvement suggested during FEAT-001 review)
+
+### 📝 Description
+The current error handling in `JsonStorage` (and potentially future storage providers) uses commented-out print statements for issues encountered during file load/save operations (e.g., `JSONDecodeError`, `IOError`). While it prevents crashes by returning default values or passing, it silences important diagnostic information.
+
+This task is to implement proper logging using Python's `logging` module within the storage layer.
+
+### 🔧 Implementation Plan
+- [ ] Configure a basic logger for the `infra.storage` module (or a more general application logger if available).
+- [ ] In `JsonStorage._load_sessions_from_file`, replace commented-out prints with `logger.error()` or `logger.warning()` calls when exceptions are caught, detailing the error and file path.
+- [ ] In `JsonStorage._save_sessions_to_file`, do the same if `StorageWriteError` is caught at a higher level, or log before raising.
+- [ ] Ensure log messages are informative and provide context.
+- [ ] Consider log levels (e.g., `ERROR` for failed saves, `WARNING` or `INFO` for recoverable load issues like empty/new file).
+
+### ✅ Acceptance Criteria
+1. Python's `logging` module is used for error/warning reporting in `JsonStorage`.
+2. Critical file I/O or parsing errors are logged with sufficient detail.
+3. Commented-out diagnostic `print` statements related to error handling are removed from `JsonStorage`.
+4. Tests are not expected to assert on log messages directly unless a specific logging test framework is introduced, but the code should demonstrate proper logger usage.
+
+### 🧐 Impact
+- Greatly improves diagnosability of storage issues in user environments.
+- Centralizes error reporting instead of relying on `print` statements.
+- Aligns with best practices for application development.
