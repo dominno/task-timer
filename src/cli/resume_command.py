@@ -1,12 +1,7 @@
 from .command_base import Command
 from src.infra.storage.json_storage import JsonStorage
-from src.domain.session import (
-    TaskSession,
-    TaskSessionStatus,
-    InvalidStateTransitionError,
-)
-from typing import Optional
-from .cli_utils import find_session_to_operate_on
+from src.cli.cli_utils import find_paused_session
+from src.domain.session import TaskSessionStatus, InvalidStateTransitionError
 
 
 class ResumeCommand(Command):
@@ -14,7 +9,9 @@ class ResumeCommand(Command):
         storage = JsonStorage()
         try:
             all_sessions = storage.get_all_sessions()
-            session_to_resume = find_session_to_operate_on(all_sessions, TaskSessionStatus.PAUSED, "resume")
+            session_to_resume = find_paused_session(
+                all_sessions, "resume"
+            )
 
             if session_to_resume:
                 currently_started_session = None
@@ -22,9 +19,11 @@ class ResumeCommand(Command):
                     if s.status == TaskSessionStatus.STARTED:
                         currently_started_session = s
                         break
-                
+
                 if currently_started_session:
-                    print(f"Error: Task '{currently_started_session.task_name}' is already RUNNING.")
+                    print(
+                        f"Error: Task '{currently_started_session.task_name}' is already RUNNING."
+                    )
                     print(f"Cannot resume '{session_to_resume.task_name}'.")
                     return
 

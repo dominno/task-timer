@@ -1,12 +1,9 @@
 from .command_base import Command
 from src.infra.storage.json_storage import JsonStorage
-from src.domain.session import (
-    TaskSession,
-    TaskSessionStatus,
-    InvalidStateTransitionError,
-)
-from typing import Optional
-from .cli_utils import find_session_to_operate_on
+from src.cli.cli_utils import find_session_to_operate_on
+from src.domain.session import TaskSessionStatus, InvalidStateTransitionError
+# from src.domain.session import TaskSession # Unused
+# from typing import Optional # Unused
 
 
 class PauseCommand(Command):
@@ -14,7 +11,9 @@ class PauseCommand(Command):
         storage = JsonStorage()
         try:
             all_sessions = storage.get_all_sessions()
-            session_to_pause = find_session_to_operate_on(all_sessions, TaskSessionStatus.STARTED, "pause")
+            session_to_pause = find_session_to_operate_on(
+                all_sessions, TaskSessionStatus.STARTED, "pause"
+            )
 
             if session_to_pause:
                 try:

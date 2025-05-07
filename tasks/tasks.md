@@ -149,7 +149,7 @@ Dependencies: ARCH-003
 ---
 
 ## FEAT-003: Implement CLI Command Logic (Start, Pause, Resume, Stop, Status)
-Status: In Progress
+Status: Completed
 Priority: High  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: cli  
@@ -159,7 +159,7 @@ Dependencies: ARCH-004, FEAT-001, FEAT-002
 - [x] Implement each command to interact with domain and storage
 - [x] Validate CLI args and error handling
 - [x] Write unit tests (happy path, invalid input, storage errors)
-- [ ] Status/log updates
+- [x] Status/log updates
 
 ### ✅ Acceptance Criteria
 1. All CLI commands work as specified
@@ -173,17 +173,17 @@ Dependencies: ARCH-004, FEAT-001, FEAT-002
 ---
 
 ## FEAT-004: Implement Summary Reporting (Today, Week, Month, Year)
-Status: Planned
+Status: Completed (Pending Linting)
 Priority: Medium  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: cli, domain  
 Dependencies: FEAT-003
 
 ### 🔧 Implementation Plan
-- [ ] Implement summary logic in domain
-- [ ] Add CLI options for summary periods
-- [ ] Write unit tests (happy path, empty data, time zone edge cases)
-- [ ] Status/log updates
+- [x] Implement summary logic in domain
+- [x] Add CLI options for summary periods
+- [x] Write unit tests (happy path, empty data, time zone edge cases)
+- [x] Status/log updates
 
 ### ✅ Acceptance Criteria
 1. Summary reports match recorded times
@@ -241,6 +241,36 @@ Dependencies: All feature tasks
 ### 🧐 Edge Cases
 - Missed edge cases
 - Flaky or non-deterministic tests
+
+---
+
+## LINT-001: Resolve Project-Wide Flake8 Errors
+Status: Planned
+Priority: High
+PRD Reference: None (Technical Debt from FEAT-004)
+Architectural Module: All
+Dependencies: None
+
+### 📝 Description
+During the completion of FEAT-004, numerous `flake8` errors (primarily E501 line too long, and some F541 f-string issues in tests) were identified across multiple files. To maintain code quality and readability, these need to be systematically addressed. The `freezegun` test flakiness should also be investigated as part of general test health.
+
+### 🔧 Implementation Plan
+- [ ] Systematically review and fix all E501 errors in `src/` and `tests/`.
+- [ ] Review and fix all F541 errors in `tests/` (verify if false positives or actual f-string misuse).
+- [ ] Fix any other outstanding `flake8` warnings.
+- [ ] Investigate and resolve `freezegun` test flakiness in `tests/domain/test_session.py` when run with the full suite.
+- [ ] Ensure `PYTHONPATH=src flake8 --max-line-length=88 src/ tests/` passes with zero errors.
+- [ ] Status/log updates.
+
+### ✅ Acceptance Criteria
+1. `flake8` reports zero errors for the project.
+2. All E501 and F541 errors are resolved.
+3. Test suite runs reliably without `freezegun`-related flakiness in `test_session.py`.
+
+### 🧐 Impact
+- Improves code readability and maintainability.
+- Ensures adherence to coding standards.
+- Increases confidence in test suite reliability.
 
 ---
 

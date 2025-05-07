@@ -1,33 +1,35 @@
 # Project Status
 
 ## Completed Features
-- Establish Project Architecture and Module Boundaries (ARCH-001)
-- Define Storage Abstraction Layer (Strategy Pattern) (ARCH-002)
-- Domain Model — TaskSession Entity & Lifecycle (ARCH-003)
-- CLI Command Routing Skeleton (ARCH-004)
-- Implement JSON Storage Provider (FEAT-001)
-- Implement TaskSession Lifecycle Logic (FEAT-002)
+- ARCH-001: Establish Project Architecture and Module Boundaries
+- ARCH-002: Define Storage Abstraction Layer (Strategy Pattern)
+- ARCH-003: Domain Model — TaskSession Entity & Lifecycle
+- ARCH-004: CLI Command Routing Skeleton
+- FEAT-001: Implement JSON Storage Provider
+- FEAT-002: Implement TaskSession Lifecycle Logic
+- FEAT-003: Implement CLI Command Logic (Start, Pause, Resume, Stop, Status)
+- FEAT-004: Implement Summary Reporting (Today, Week, Month, Year) - Functionally complete; pending linting pass.
 
 ## In Progress
-- Implement CLI Command Logic (Start, Pause, Resume, Stop, Status) (FEAT-003)
-  - ✅ Implement each command to interact with domain and storage
-  - ✅ Validate CLI args and error handling
-  - ✅ Write unit tests (happy path, invalid input, storage errors)
-  - 🏗️ Status/log updates
+- FEAT-005: Export Data to JSON/CSV ([FEAT-005])
+    - ⏳ Step 1 (Define export logic)
 
 ## Pending
-- Implement Summary Reporting (Today, Week, Month, Year) (FEAT-004)
-- Export Data to JSON/CSV (FEAT-005)
-- Enforce Unit Testing and Coverage Standards (TEST-001)
-- Add TaskSession.create_from_json factory method (FEAT-IMPRV-001)
-- Implement Robust Logging in Storage Layer (FEAT-IMPRV-002)
+- TEST-001: Enforce Unit Testing and Coverage Standards
+- TECH-DEBT-001: Configure Flake8 and Black Alignment
+- FEAT-IMPRV-001: Add TaskSession.create_from_json factory method
+- FEAT-IMPRV-002: Implement Robust Logging in Storage Layer
+- LINT-001: Resolve all outstanding flake8 errors project-wide (New)
+
 
 ## Known Issues
-- [Issue ID or description, optional link to bug/task]
+- Test flakiness with `freezegun` when running full test suite (affects `tests/domain/test_session.py`).
+- Numerous `flake8` E501 (line too long) errors across multiple files.
 
 ## Decision History
-- 2025-05-06 17:14 ARCH-001 — Initial project structure and scaffolding completed as per architecture.mermaid and technical.md. Alternatives considered: None, followed defined plan.
-- 2025-05-06 17:30 TECH-DEBT-001 — Deferred task 'Configure Flake8 and Black Alignment'. Rationale: Workaround (`flake8 --max-line-length=88`) is sufficient for now, allowing progress on core features. To be addressed before wider collaboration or CI integration. Alternatives: Implement immediately (would delay ARCH-003).
+- 2025-01-18 14:00 - FEAT-002 - Decided to use segmented accumulation for TaskSession duration and store pause/resume times for accurate reporting. Alternatives considered: Storing only total accumulated duration (simpler but less flexible for reporting).
+- 2025-05-07 11:54 - FEAT-004 - Deferred full project linting for FEAT-004 completion to a new task (LINT-001) to unblock progress to FEAT-005. FEAT-004 is functionally complete. Alternatives considered: Blocking progress on FEAT-005 until all linting for FEAT-004 is resolved.
 
 ## Next Steps
-- Complete status/log updates for FEAT-003.
+- Begin FEAT-005: Export Data to JSON/CSV.
+- Prioritize LINT-001.

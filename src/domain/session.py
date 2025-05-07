@@ -35,6 +35,8 @@ class TaskSession:
                                          completed segments.
         _current_segment_start_time (Optional[datetime]): Internal: Time current
                                                        active segment started, or None.
+        _pause_times: list[datetime] = field(default_factory=list, init=False)
+        _resume_times: list[datetime] = field(default_factory=list, init=False)
         duration (timedelta): Calculated total active duration of the session.
 
     State Transitions (managed by lifecycle methods):
@@ -49,8 +51,17 @@ class TaskSession:
     start_time: datetime
     end_time: Optional[datetime] = None
     status: TaskSessionStatus = TaskSessionStatus.STARTED
-    _accumulated_duration: timedelta = field(default_factory=timedelta, init=False)
-    _current_segment_start_time: Optional[datetime] = field(init=False, default=None)
+
+    # Internal fields for accurate duration calculation across pauses/resumes
+    _accumulated_duration: timedelta = field(init=False, default_factory=timedelta)
+    # Stores total duration of completed segments (when paused/stopped).
+
+    _current_segment_start_time: Optional[datetime] = field(init=False)
+    # If task is STARTED, marks beginning of current active segment.
+
+    # To reconstruct segments for reporting or detailed logs
+    _pause_times: list[datetime] = field(init=False, default_factory=list)
+    _resume_times: list[datetime] = field(default_factory=list, init=False)
 
     def __post_init__(self):
         if not isinstance(self.start_time, datetime):
@@ -83,15 +94,18 @@ class TaskSession:
 
     @property
     def duration(self) -> timedelta:
-        current_segment_duration = timedelta(0)
+        """Calculates the total active duration of the task session."""
+        # Assumes if STARTED, `now` is current time.
+        # For PAUSED/STOPPED, duration is fixed.
+        # Accumulation happens in pause() and stop() methods.
+        now = datetime.now(timezone.utc)
+        current_duration = self._accumulated_duration
         if (
             self.status == TaskSessionStatus.STARTED
             and self._current_segment_start_time
         ):
-            now = datetime.now(timezone.utc)
-            # _current_segment_start_time is now guaranteed to be UTC
-            current_segment_duration = now - self._current_segment_start_time
-        return self._accumulated_duration + current_segment_duration
+            current_duration += now - self._current_segment_start_time
+        return current_duration
 
     def pause(self) -> None:
         """Pauses an active (STARTED) session."""
@@ -112,6 +126,7 @@ class TaskSession:
             # _current_segment_start_time is now guaranteed to be UTC
             self._accumulated_duration += now - self._current_segment_start_time
 
+        self._pause_times.append(now)  # Record pause time
         self.status = TaskSessionStatus.PAUSED
         self._current_segment_start_time = None
 
@@ -126,8 +141,10 @@ class TaskSession:
                 "Cannot resume a session that is already STOPPED."
             )
 
+        now = datetime.now(timezone.utc)
+        self._resume_times.append(now)  # Record resume time
         self.status = TaskSessionStatus.STARTED
-        self._current_segment_start_time = datetime.now(timezone.utc)  # This is UTC
+        self._current_segment_start_time = now  # This is UTC
 
     def stop(self) -> None:
         """Stops an active (STARTED) or PAUSED session."""
@@ -148,3 +165,46 @@ class TaskSession:
         self.end_time = now  # This is UTC
         self.status = TaskSessionStatus.STOPPED
         self._current_segment_start_time = None
+
+    def get_active_segments(self) -> list[tuple[datetime, datetime]]:
+        """Reconstructs and returns a list of [start, end] tuples for active segments."""
+        segments: list[tuple[datetime, datetime]] = []
+        if not self.start_time:
+            return segments  # Should not happen for a valid session
+
+        current_segment_start = self.start_time
+        num_pauses = len(self._pause_times)
+        num_resumes = len(self._resume_times)
+
+        # Iterate through recorded pauses
+        for i in range(num_pauses):
+            pause_time = self._pause_times[i]
+            if (
+                current_segment_start < pause_time
+            ):  # Ensure segment has positive duration
+                segments.append((current_segment_start, pause_time))
+
+            if i < num_resumes:
+                current_segment_start = self._resume_times[i]
+            else:
+                # Paused and not resumed further, so no more segments from here
+                current_segment_start = None
+                break
+
+        # Handle the last segment if the session is not PAUSED or was never paused
+        if (
+            current_segment_start
+        ):  # This means it's either running or was stopped while running
+            if self.status == TaskSessionStatus.STARTED:
+                # Currently running: segment is from last resume (or start_time) to now
+                # Use a consistent "now" for this calculation if called multiple times rapidly
+                # but for segment definition, datetime.now is fine.
+                segments.append((current_segment_start, datetime.now(timezone.utc)))
+            elif self.status == TaskSessionStatus.STOPPED and self.end_time:
+                # Stopped: segment is from last resume (or start_time) to end_time
+                if current_segment_start < self.end_time:
+                    segments.append((current_segment_start, self.end_time))
+            # If PAUSED, the last segment was already added up to the last pause_time,
+            # and current_segment_start would be None.
+
+        return segments

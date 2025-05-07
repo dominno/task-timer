@@ -34,7 +34,9 @@ class StatusCommand(Command):
 
             # If exactly one active session
             session_to_report = active_sessions[0]
-            formatted_start_time = session_to_report.start_time.strftime('%Y-%m-%d %H:%M:%S UTC')
+            formatted_start_time = session_to_report.start_time.strftime(
+                "%Y-%m-%d %H:%M:%S UTC"
+            )
             current_duration_str = format_timedelta_for_cli(session_to_report.duration)
 
             if session_to_report.status == TaskSessionStatus.STARTED:

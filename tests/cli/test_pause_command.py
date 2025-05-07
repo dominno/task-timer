@@ -62,7 +62,7 @@ def test_pause_command_active_task(
     mock_storage_provider_pause.save_task_session.assert_called_once_with(
         started_session
     )
-    mock_print.assert_any_call(f"Task 'Active Task' paused.")
+    mock_print.assert_any_call("Task 'Active Task' paused.")
 
 
 @pytest.mark.skipif(
@@ -111,45 +111,65 @@ def test_pause_command_already_paused(
     command = PauseCommand()
     command.execute([])
     mock_storage_provider_pause.save_task_session.assert_not_called()
-    mock_print.assert_any_call("Error: Task 'Paused Task' is already PAUSED. Cannot pause again.")
+    mock_print.assert_any_call(
+        "Error: Task 'Paused Task' is already PAUSED. Cannot pause again."
+    )
 
 
-@pytest.mark.skipif(PauseCommand is None or TaskSession is None or InvalidStateTransitionError is None or JsonStorage is None, reason="Dependencies not met")
+@pytest.mark.skipif(
+    PauseCommand is None
+    or TaskSession is None
+    or InvalidStateTransitionError is None
+    or JsonStorage is None,
+    reason="Dependencies not met",
+)
 @freeze_time(FROZEN_TIME_STR)
 @mock.patch("builtins.print")
 @mock.patch("src.cli.pause_command.JsonStorage")
-def test_pause_command_domain_error(mock_json_storage_class, mock_print, mock_storage_provider_pause):
+def test_pause_command_domain_error(
+    mock_json_storage_class, mock_print, mock_storage_provider_pause
+):
     """Test PauseCommand handles InvalidStateTransitionError from domain."""
     # This case should ideally not be hit if CLI logic is correct, but tests robustness
     # For example, if somehow a STOPPED session was found and pause attempted on it.
-    stopped_session = TaskSession(task_name="Stopped Task", start_time=FROZEN_DATETIME - timedelta(hours=2), status=TaskSessionStatus.STOPPED)
+    stopped_session = TaskSession(
+        task_name="Stopped Task",
+        start_time=FROZEN_DATETIME - timedelta(hours=2),
+        status=TaskSessionStatus.STOPPED,
+    )
+
     def mock_pause_method():
-        raise InvalidStateTransitionError("Cannot pause a session that is already STOPPED.")
-    stopped_session.pause = mock_pause_method # mock.MagicMock(side_effect=InvalidStateTransitionError("Cannot pause STOPPED."))
-    
-    mock_storage_provider_pause.get_all_sessions.return_value = [stopped_session] # Assume logic tries to pause it
+        raise InvalidStateTransitionError(
+            "Cannot pause a session that is already STOPPED."
+        )
+
+    stopped_session.pause = mock_pause_method
+
+    mock_storage_provider_pause.get_all_sessions.return_value = [stopped_session]
     mock_json_storage_class.return_value = mock_storage_provider_pause
 
     command = PauseCommand()
     # We need to simulate the command identifying this session as the one to pause.
     # The current pause command logic will determine this. For now, let's assume it picks one.
-    # If the command's logic correctly filters out STOPPED sessions, this direct test might be tricky.
-    # A better way: ensure PauseCommand *only* tries to pause STARTED sessions.
+    # If the command's logic correctly filters out STOPPED sessions, this direct test might be
+    # tricky. A better way: ensure PauseCommand *only* tries to pause STARTED sessions.
     # This test becomes more about if pause() itself fails, how the CLI command reacts.
-    
-    # Let's refine: test that if a session is identified as active (STARTED) but its .pause() fails,
-    # the CLI handles it. This requires the CLI to find a STARTED session first.
+
+    # Let's refine: test that if a session is identified as active (STARTED) but its .pause()
+    # fails, the CLI handles it. This requires the CLI to find a STARTED session first.
     active_session_causing_error = TaskSession(
-        task_name="Error Task", 
-        start_time=FROZEN_DATETIME - timedelta(minutes=5), 
-        status=TaskSessionStatus.STARTED
+        task_name="Error Task",
+        start_time=FROZEN_DATETIME - timedelta(minutes=5),
+        status=TaskSessionStatus.STARTED,
     )
     active_session_causing_error.pause = mock.MagicMock(
         side_effect=InvalidStateTransitionError("Internal domain error on pause.")
     )
-    mock_storage_provider_pause.get_all_sessions.return_value = [active_session_causing_error]
+    mock_storage_provider_pause.get_all_sessions.return_value = [
+        active_session_causing_error
+    ]
 
     command.execute([])
     mock_storage_provider_pause.save_task_session.assert_not_called()
-    mock_print.assert_any_call(f"Error pausing task 'Error Task':")
+    mock_print.assert_any_call("Error pausing task 'Error Task':")
     mock_print.assert_any_call("Internal domain error on pause.")

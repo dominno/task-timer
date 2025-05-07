@@ -20,7 +20,9 @@ except ImportError:
     JsonStorage = None  # type: ignore
 
 FROZEN_TIME_STR = "2024-01-12T10:00:00Z"
-FROZEN_DATETIME = datetime.fromisoformat(FROZEN_TIME_STR.replace("Z", "+00:00"))
+FROZEN_DATETIME = datetime.fromisoformat(
+    FROZEN_TIME_STR.replace("Z", "+00:00")
+)
 
 
 @pytest.fixture
@@ -60,15 +62,16 @@ def test_resume_command_paused_task(
     command = ResumeCommand()
     command.execute([])
 
-    paused_session.resume.assert_called_once()  # Verify domain object's resume() was called
+    paused_session.resume.assert_called_once()  # Verify domain object's resume()
     mock_storage_provider_resume.save_task_session.assert_called_once_with(
         paused_session
     )
-    mock_print.assert_any_call(f"Task 'Paused Task' resumed.")
+    mock_print.assert_any_call("Task 'Paused Task' resumed.")
 
 
 @pytest.mark.skipif(
-    ResumeCommand is None or JsonStorage is None, reason="Dependencies not met"
+    ResumeCommand is None or JsonStorage is None,
+    reason="Dependencies not met"
 )
 @freeze_time(FROZEN_TIME_STR)
 @mock.patch("builtins.print")
@@ -90,14 +93,18 @@ def test_resume_command_no_paused_task(
     command = ResumeCommand()
     command.execute([])
     mock_storage_provider_resume.save_task_session.assert_not_called()
-    mock_print.assert_any_call("Error: No task is currently PAUSED to resume.")
+    mock_print.assert_any_call(
+        "Error: No task is currently PAUSED to resume."
+    )
 
     # Test with no sessions at all
     mock_print.reset_mock()
     mock_storage_provider_resume.get_all_sessions.return_value = []
     command.execute([])
     mock_storage_provider_resume.save_task_session.assert_not_called()
-    mock_print.assert_any_call("Error: No task is currently PAUSED to resume.")
+    mock_print.assert_any_call(
+        "Error: No task is currently PAUSED to resume."
+    )
 
 
 @pytest.mark.skipif(
@@ -110,7 +117,7 @@ def test_resume_command_no_paused_task(
 def test_resume_command_already_started(
     mock_json_storage_class, mock_print, mock_storage_provider_resume
 ):
-    """Test ResumeCommand prints error if a task is already STARTED (and no other is paused)."""
+    """Test ResumeCommand prints error if a task is already STARTED."""
     started_session = TaskSession(
         task_name="Running Task",
         start_time=FROZEN_DATETIME - timedelta(hours=1),
@@ -123,7 +130,7 @@ def test_resume_command_already_started(
     command.execute([])
     mock_storage_provider_resume.save_task_session.assert_not_called()
     mock_print.assert_any_call(
-        f"Error: Task 'Running Task' is already RUNNING. No task to resume."
+        "Error: Task 'Running Task' is already RUNNING. No task to resume."
     )
 
 
@@ -147,7 +154,9 @@ def test_resume_command_domain_error(
         status=TaskSessionStatus.PAUSED,
     )
     paused_session_causing_error.resume = mock.MagicMock(
-        side_effect=InvalidStateTransitionError("Internal domain error on resume.")
+        side_effect=InvalidStateTransitionError(
+            "Internal domain error on resume."
+        )
     )
     mock_storage_provider_resume.get_all_sessions.return_value = [
         paused_session_causing_error
@@ -157,5 +166,5 @@ def test_resume_command_domain_error(
     command = ResumeCommand()
     command.execute([])
     mock_storage_provider_resume.save_task_session.assert_not_called()
-    mock_print.assert_any_call(f"Error resuming 'Error Task':")
+    mock_print.assert_any_call("Error resuming 'Error Task':")
     mock_print.assert_any_call("Internal domain error on resume.")

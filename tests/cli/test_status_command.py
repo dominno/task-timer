@@ -10,7 +10,7 @@ try:
     )  # Assuming it will be in status_command.py
     from src.domain.session import TaskSession, TaskSessionStatus
     from src.infra.storage.json_storage import JsonStorage
-    from src.cli.cli_utils import format_timedelta_for_cli # UPDATED IMPORT PATH
+    from src.cli.cli_utils import format_timedelta_for_cli  # UPDATED IMPORT PATH
 except ImportError:
     StatusCommand = None  # type: ignore
     TaskSession = None  # type: ignore
@@ -62,11 +62,11 @@ def test_status_command_running_task(
     command = StatusCommand()
     command.execute([])
 
-    formatted_start_time = start_time.strftime('%Y-%m-%d %H:%M:%S UTC')
+    formatted_start_time = start_time.strftime("%Y-%m-%d %H:%M:%S UTC")
     formatted_duration = format_timedelta_for_cli(expected_duration)
-    mock_print.assert_any_call(f"Task 'Work in Progress' is RUNNING.")
-    mock_print.assert_any_call(f"  Started at: {formatted_start_time}")
-    mock_print.assert_any_call(f"  Current duration: {formatted_duration}.")
+    mock_print.assert_any_call("Task 'Work in Progress' is RUNNING.")
+    mock_print.assert_any_call("  Started at: " + formatted_start_time)
+    mock_print.assert_any_call("  Current duration: " + formatted_duration + ".")
 
 
 @pytest.mark.skipif(
@@ -99,11 +99,11 @@ def test_status_command_paused_task(
     command = StatusCommand()
     command.execute([])
 
-    formatted_start_time = start_time.strftime('%Y-%m-%d %H:%M:%S UTC')
+    formatted_start_time = start_time.strftime("%Y-%m-%d %H:%M:%S UTC")
     formatted_duration = format_timedelta_for_cli(paused_session._accumulated_duration)
-    mock_print.assert_any_call(f"Task 'On Break' is PAUSED.")
-    mock_print.assert_any_call(f"  Started at: {formatted_start_time}")
-    mock_print.assert_any_call(f"  Accumulated duration: {formatted_duration}.")
+    mock_print.assert_any_call("Task 'On Break' is PAUSED.")
+    mock_print.assert_any_call("  Started at: " + formatted_start_time)
+    mock_print.assert_any_call("  Accumulated duration: " + formatted_duration + ".")
 
 
 @pytest.mark.skipif(
@@ -145,7 +145,8 @@ def test_status_command_no_active_task(
 def test_status_command_multiple_active_error(
     mock_json_storage_class, mock_print, mock_storage_provider_status
 ):
-    """Test StatusCommand prints error if multiple active tasks are found (e.g., one STARTED, one PAUSED)."""
+    """Test StatusCommand prints error if multiple active "tasks" are found
+    (e.g., one STARTED, one PAUSED)."""
     session1 = TaskSession(
         task_name="Task One",
         start_time=FROZEN_DATETIME - timedelta(hours=2),

@@ -60,9 +60,12 @@ def test_stop_command_started_task(
     )
     # Mock the stop method to verify call and control its side effects for testing
     started_session.stop = mock.MagicMock()
-    # Simulate what stop() would do to the session for duration checking if it were real
-    # When stop() is called, it will set end_time and status. Duration is calculated then.
-    # For this test, we need to ensure the duration is as expected after stop() is called.
+    # Simulate what stop() would do to the session for duration checking
+    # if it were real.
+    # When stop() is called, it will set end_time and status. Duration is
+    # calculated then.
+    # For this test, we need to ensure the duration is as expected
+    # after stop() is called.
     # The actual stop() method will update _accumulated_duration. We'll mock that.
 
     def mock_stop_impl():  # Simulate what the real stop() does for return values
@@ -73,7 +76,8 @@ def test_stop_command_started_task(
         )  # This is key
 
     started_session.stop.side_effect = mock_stop_impl
-    # The `duration` property will be called by the command AFTER stop() has modified the session.
+    # The `duration` property will be called by the command
+    # AFTER stop() has modified the session.
     type(started_session).duration = mock.PropertyMock(
         return_value=FROZEN_DATETIME - start_time
     )
@@ -85,9 +89,11 @@ def test_stop_command_started_task(
     command.execute([])
 
     started_session.stop.assert_called_once()
-    mock_storage_provider_stop.save_task_session.assert_called_once_with(started_session)
+    mock_storage_provider_stop.save_task_session.assert_called_once_with(
+        started_session
+    )
     expected_duration_str = format_timedelta(FROZEN_DATETIME - start_time)
-    mock_print.assert_any_call(f"Task 'Running Task' stopped.")
+    mock_print.assert_any_call("Task 'Running Task' stopped.")
     mock_print.assert_any_call(f"  Total duration: {expected_duration_str}.")
 
 
@@ -131,7 +137,7 @@ def test_stop_command_paused_task(
     paused_session.stop.assert_called_once()
     mock_storage_provider_stop.save_task_session.assert_called_once_with(paused_session)
     expected_duration_str = format_timedelta(timedelta(minutes=45))
-    mock_print.assert_any_call(f"Task 'Paused Task' stopped.")
+    mock_print.assert_any_call("Task 'Paused Task' stopped.")
     mock_print.assert_any_call(f"  Total duration: {expected_duration_str}.")
 
 
@@ -172,7 +178,8 @@ def test_stop_command_no_active_task(
 def test_stop_command_domain_error(
     mock_json_storage_class, mock_print, mock_storage_provider_stop
 ):
-    """Test StopCommand handles InvalidStateTransitionError from domain if trying to stop an already STOPPED task."""
+    """Test StopCommand handles InvalidStateTransitionError from domain
+    if trying to stop an already STOPPED task."""
     active_session_causing_error = TaskSession(
         task_name="Error Task",
         start_time=FROZEN_DATETIME - timedelta(minutes=5),
@@ -189,5 +196,5 @@ def test_stop_command_domain_error(
     command = StopCommand()
     command.execute([])
     mock_storage_provider_stop.save_task_session.assert_not_called()
-    mock_print.assert_any_call(f"Error stopping task 'Error Task':")
+    mock_print.assert_any_call("Error stopping task 'Error Task':")
     mock_print.assert_any_call("Internal domain error on stop.")

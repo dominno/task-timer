@@ -20,11 +20,15 @@ class StartCommand(Command):
             all_sessions = storage.get_all_sessions()
             for session in all_sessions:
                 if session.status == TaskSessionStatus.STARTED:
-                    print(f"Error: Task '{session.task_name}' is STARTED. Stop it first.")
+                    print(
+                        f"Error: Task '{session.task_name}' is STARTED. Stop it first."
+                    )
                     active_session_found = True
                     break
                 elif session.status == TaskSessionStatus.PAUSED:
-                    print(f"Error: Task '{session.task_name}' is PAUSED. Resume and stop, or stop it.")
+                    print(
+                        f"Error: Task '{session.task_name}' is PAUSED. Resume and stop, or stop it."
+                    )
                     active_session_found = True
                     break
         except Exception as e:
@@ -38,12 +42,12 @@ class StartCommand(Command):
         try:
             # Ensure start_time is timezone-aware UTC, matching TaskSession
             # internal handling
-            start_time = datetime.now(timezone.utc) 
+            start_time = datetime.now(timezone.utc)
             new_session = TaskSession(task_name=task_name, start_time=start_time)
             storage.save_task_session(new_session)
             # strftime %Z might be unreliable.
             # A more robust way if start_time is guaranteed UTC:
-            start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S UTC')
+            start_time_str = start_time.strftime("%Y-%m-%d %H:%M:%S UTC")
             print(f"Task '{task_name}' started at {start_time_str}.")
         except Exception as e:
             print(f"Error starting task: {e}")

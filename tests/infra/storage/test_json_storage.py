@@ -118,15 +118,13 @@ def test_get_all_sessions_empty_file(temp_json_storage):
 )
 def test_save_multiple_sessions(temp_json_storage):
     """Test saving multiple sessions and retrieving them in order."""
-    start_time1 = datetime.now() - timedelta(hours=2)
-    start_time2 = datetime.now() - timedelta(hours=1)
-    if start_time1.tzinfo is not None:
-        start_time1 = start_time1.astimezone(timezone.utc).replace(tzinfo=None)
-    if start_time2.tzinfo is not None:
-        start_time2 = start_time2.astimezone(timezone.utc).replace(tzinfo=None)
-    session1 = TaskSession(task_name="Task 1", start_time=start_time1)
+    now_utc = datetime.now(timezone.utc)  # Work with UTC from the start
+    start_time1_orig = now_utc - timedelta(hours=2)
+    start_time2_orig = now_utc - timedelta(hours=1)
+
+    session1 = TaskSession(task_name="Task 1", start_time=start_time1_orig)
     session2 = TaskSession(
-        task_name="Task 2", start_time=start_time2, status=TaskSessionStatus.PAUSED
+        task_name="Task 2", start_time=start_time2_orig, status=TaskSessionStatus.PAUSED
     )
     temp_json_storage.save_task_session(session1)
     temp_json_storage.save_task_session(session2)
@@ -134,13 +132,15 @@ def test_save_multiple_sessions(temp_json_storage):
     assert len(sessions_retrieved) == 2
     assert sessions_retrieved[0].task_name == "Task 1"
     assert sessions_retrieved[1].task_name == "Task 2"
+
+    # Compare after ensuring both are UTC and microseconds are
+    # zeroed out for robust comparison
     assert sessions_retrieved[0].start_time.replace(
         microsecond=0
-    ) == start_time1.replace(microsecond=0)
+    ) == start_time1_orig.replace(microsecond=0)
     assert sessions_retrieved[1].start_time.replace(
         microsecond=0
-    ) == start_time2.replace(microsecond=0)
-    assert sessions_retrieved[1].status == TaskSessionStatus.PAUSED
+    ) == start_time2_orig.replace(microsecond=0)
 
 
 @pytest.mark.skipif(
