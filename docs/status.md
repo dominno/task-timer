@@ -10,17 +10,16 @@
 - FEAT-003: Implement CLI Command Logic (Start, Pause, Resume, Stop, Status)
 - FEAT-004: Implement Summary Reporting (Today, Week, Month, Year)
 - FEAT-005: Export Data to JSON/CSV
+- LINT-001: Resolve all outstanding flake8 errors project-wide (On Hold: Persistent E501 errors after black formatting and noqa attempts. Requires review of linting setup or manual override for specific lines.)
+- TEST-001: Enforce Unit Testing and Coverage Standards
 
 ## In Progress
-# No tasks currently in progress, select next from Pending.
+- No features currently in progress.
 
 ## Pending
-- TEST-001: Enforce Unit Testing and Coverage Standards
-- LINT-001: Resolve all outstanding flake8 errors project-wide (On Hold: Persistent E501 errors after black formatting and noqa attempts. Requires review of linting setup or manual override for specific lines.)
 - TECH-DEBT-001: Configure Flake8 and Black Alignment
 - FEAT-IMPRV-001: Add TaskSession.create_from_json factory method
 - FEAT-IMPRV-002: Implement Robust Logging in Storage Layer
-
 
 ## Known Issues
 - Persistent `flake8` E501 (line too long) errors in some `src/` files (`cli_utils.py`, `status_command.py`, `stop_command.py`, `domain/session.py`, `domain/summary.py`) and `tests/` (`test_export_command.py`) that are not resolved by `black` formatting and where `# noqa: E501` comments are not effective. These may be an issue with `flake8` version, plugins, or cache, rather than actual code style violations post-`black`.

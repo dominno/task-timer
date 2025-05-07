@@ -219,8 +219,21 @@ class JsonStorage(StorageProvider):
 
     def save_task_session(self, session: TaskSession) -> None:
         sessions = self._load_sessions_from_file()
-        # Simple append. If sessions could be updated by ID, logic would be different.
-        sessions.append(session)
+        found_and_updated = False
+        for i, existing_session in enumerate(sessions):
+            if (
+                existing_session.task_name == session.task_name
+                and existing_session.start_time == session.start_time
+            ):
+                print(f"save_task_session: Updating session: {session.task_name} {session.start_time}")
+                sessions[i] = session  # Replace existing
+                found_and_updated = True
+                break
+
+        if not found_and_updated:
+            print(f"save_task_session: Appending session: {session.task_name} {session.start_time}")
+            sessions.append(session) # Append if not found
+
         self._save_sessions_to_file(sessions)
 
     def get_all_sessions(self) -> List[TaskSession]:

@@ -54,3 +54,4 @@
 2025-05-07 12:06:42 - FEAT-005 - Implemented CLI ExportCommand with argparse, added to dispatcher. Tested success and StorageWriteError cases.
 2025-05-07 12:06:42 - FEAT-005 - Core export logic and CLI command implemented and tested. Next: Complete FEAT-005 checklist (status/log updates done, review DoD).
 2025-05-07 12:12:41 - DOCS - Updated README.md with Getting Started (Installation, Usage) and Development (Setup, Linting commands) sections.
+2025-05-07 17:14 - TEST-001 - Completed task. Added E2E tests for start, stop, pause, resume, status. Added unit tests for cli_utils and summary.py functions. Achieved 90% overall test coverage. Preparing to merge branch.

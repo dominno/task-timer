@@ -174,3 +174,39 @@ def test_pause_command_domain_error(
     mock_storage_provider_pause.save_task_session.assert_not_called()
     mock_print.assert_any_call("Error pausing task 'Error Task':")
     mock_print.assert_any_call(error_message)
+
+
+@pytest.mark.skipif(
+    PauseCommand is None or TaskSession is None or JsonStorage is None,
+    reason="Dependencies not met",
+)
+@freeze_time(FROZEN_TIME_STR)
+@mock.patch("builtins.print")
+@mock.patch("src.cli.pause_command.JsonStorage")
+def test_pause_command_save_error(
+    mock_json_storage_class, mock_print, mock_storage_provider_pause
+):
+    """Test PauseCommand handles exceptions during storage save."""
+    active_session = TaskSession(
+        task_name="Save Fail Task",
+        start_time=FROZEN_DATETIME - timedelta(minutes=10),
+        status=TaskSessionStatus.STARTED,
+    )
+    # Mock pause to work correctly in this instance
+    active_session.pause = mock.MagicMock()
+    
+    mock_storage_provider_pause.get_all_sessions.return_value = [active_session]
+    
+    # Make save_task_session raise an error
+    save_error_message = "Disk is full!"
+    mock_storage_provider_pause.save_task_session.side_effect = Exception(save_error_message)
+    
+    mock_json_storage_class.return_value = mock_storage_provider_pause
+
+    command = PauseCommand()
+    command.execute([])
+
+    active_session.pause.assert_called_once() # Ensure pause was attempted
+    mock_storage_provider_pause.save_task_session.assert_called_once_with(active_session)
+    mock_print.assert_any_call("Error saving paused task 'Save Fail Task':")
+    mock_print.assert_any_call(save_error_message)

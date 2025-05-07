@@ -1,7 +1,8 @@
 # Utilities for data export functionality
 
 from typing import List
-from src.domain.session import TaskSession  # Import TaskSession directly
+from src.domain.session import TaskSession, TaskSessionStatus
+from datetime import datetime, timezone
 
 
 def task_session_to_csv_row(session: TaskSession) -> List[str]:
@@ -10,9 +11,11 @@ def task_session_to_csv_row(session: TaskSession) -> List[str]:
     start_time_utc_str = session.start_time.isoformat() if session.start_time else ""
     end_time_utc_str = session.end_time.isoformat() if session.end_time else ""
 
-    # Calculate total_duration_seconds. TaskSession.duration is a timedelta.
-    # The duration property handles live calculation for STARTED sessions.
-    total_duration_seconds = str(int(session.duration.total_seconds()))
+    # Use get_duration_at with current time for total duration including live segment if running
+    # The .duration property now only returns _accumulated_duration
+    now = datetime.now(timezone.utc)
+    total_session_duration = session.get_duration_at(now)
+    total_duration_seconds = str(int(total_session_duration.total_seconds()))
 
     status_str = session.status.value
 

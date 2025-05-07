@@ -26,8 +26,8 @@ def test_task_session_to_csv_row_basic_stopped_session():
         end_time=end_time,
         status=TaskSessionStatus.STOPPED,
     )
-    # Manually set internal fields that __post_init__ would set for a stopped session
-    session._accumulated_duration = end_time - start_time
+    # Rely on __post_init__ to set _accumulated_duration correctly for STOPPED sessions
+    print(f"Inside test: session._accumulated_duration = {session._accumulated_duration}")
 
     expected_csv_row = [
         "Test Task 1",  # task_name
