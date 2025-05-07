@@ -5,6 +5,8 @@ import os  # For default file path construction
 import json  # Will be needed soon
 from datetime import datetime, timedelta, timezone
 from dataclasses import asdict
+import csv  # Added for export_to_csv method
+from src.utils.export_utils import task_session_to_csv_row
 
 # from ...domain.session import TaskSession # Adjust path as needed
 
@@ -184,8 +186,8 @@ class JsonStorage(StorageProvider):
     def _load_sessions_from_file(self) -> List[TaskSession]:
         try:
             if (
-                not os.path.exists(self.file_path) or
-                os.path.getsize(self.file_path) == 0
+                not os.path.exists(self.file_path)
+                or os.path.getsize(self.file_path) == 0
             ):
                 return []
             with open(self.file_path, "r") as f:
@@ -227,3 +229,50 @@ class JsonStorage(StorageProvider):
     def clear(self) -> None:
         # print(f"Placeholder: Clearing JSON storage at {self.file_path}")
         self._save_sessions_to_file([])  # Save an empty list
+
+    def export_to_csv(self, target_path: str) -> None:
+        """Exports all task sessions to a CSV file at the given path."""
+        sessions = self._load_sessions_from_file()
+        if not sessions:
+            # print(f"No sessions to export to CSV at {target_path}")
+            # Create an empty CSV with headers if no sessions? Or just do nothing?
+            # For now, let's write a CSV with only headers if no sessions.
+            pass  # Let it fall through to write headers
+
+        header = [
+            "task_name",
+            "start_time_utc",
+            "end_time_utc",
+            "status",
+            "total_duration_seconds",
+            "first_pause_time_utc",
+            "last_resume_time_utc",
+            "number_of_pauses",
+        ]
+
+        try:
+            with open(target_path, "w", newline="") as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(header)
+                for session in sessions:
+                    writer.writerow(task_session_to_csv_row(session))
+        except IOError as e:
+            # print(f"Error writing to CSV file {target_path}: {e}") # For debugging
+            raise StorageWriteError(
+                f"Failed to write sessions to CSV file {target_path}: {e}"
+            ) from e
+
+    def export_to_json(self, target_path: str) -> None:
+        """Exports all task sessions to a JSON file at the given path."""
+        sessions = self._load_sessions_from_file()
+        # We can reuse _save_sessions_to_file by temporarily changing self.file_path,
+        # or by creating a helper that _save_sessions_to_file also uses.
+        # For simplicity, let's adapt the core logic of _save_sessions_to_file here.
+        try:
+            data_list = [session_to_dict(s) for s in sessions]
+            with open(target_path, "w") as f:
+                json.dump(data_list, f, indent=4)
+        except IOError as e:
+            raise StorageWriteError(
+                f"Failed to write sessions to JSON file {target_path}: {e}"
+            ) from e

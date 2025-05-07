@@ -5,6 +5,7 @@ from src.cli.resume_command import ResumeCommand
 from src.cli.stop_command import StopCommand
 from src.cli.status_command import StatusCommand
 from src.cli.summary_command import SummaryCommand
+from src.cli.export_command import ExportCommand
 
 COMMANDS = {
     "start": StartCommand,
@@ -13,6 +14,7 @@ COMMANDS = {
     "stop": StopCommand,
     "status": StatusCommand,
     "summary": SummaryCommand,
+    "export": ExportCommand,
 }
 
 

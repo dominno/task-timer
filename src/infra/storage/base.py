@@ -44,6 +44,16 @@ class StorageProvider(ABC):
         """
         pass
 
+    @abstractmethod
+    def export_to_csv(self, target_path: str) -> None:
+        """Exports all task sessions to a CSV file at the given path."""
+        pass
+
+    @abstractmethod
+    def export_to_json(self, target_path: str) -> None:
+        """Exports all task sessions to a JSON file at the given path."""
+        pass
+
 
 class StorageError(Exception):
     """Base class for storage-related errors."""

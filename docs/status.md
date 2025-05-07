@@ -12,7 +12,10 @@
 
 ## In Progress
 - FEAT-005: Export Data to JSON/CSV ([FEAT-005])
-    - ⏳ Step 1 (Define export logic)
+    - ✅ Define export logic (JSON & CSV in StorageProvider & JsonStorage)
+    - ✅ Add CLI command for export (ExportCommand with argparse)
+    - ✅ Write unit tests (Core logic for storage and CLI command)
+    - ⏳ Status/log updates (this step)
 
 ## Pending
 - TEST-001: Enforce Unit Testing and Coverage Standards

@@ -48,3 +48,8 @@
 2025-05-07 11:51:17 - FEAT-002 - Completed FEAT-002 checklist, Definition of Done review initiated. Linting/formatting next.
 2025-05-07 11:54:24 - FEAT-004 - Functional implementation of summary reporting (Today, Week, Month, Year) complete. Unit tests for core logic passing. Linting (numerous E501 errors) and full test suite stability (freezegun flakiness) are pending and will be addressed under a separate task. Proceeding with status updates.
 2025-05-07 11:54:24 - PROCESS - Decision: Deferred outstanding linting for FEAT-004 to a new global linting task to unblock progress to FEAT-005. FEAT-004 considered functionally complete.
+2025-05-07 12:06:42 - FEAT-005 - Started task: Export Data to JSON/CSV. Created feature branch feature/FEAT-005-export-data-to-json-csv.
+2025-05-07 12:06:42 - FEAT-005 - Implemented CSV export: Added task_session_to_csv_row utility with tests. Added export_to_csv to StorageProvider and JsonStorage with tests.
+2025-05-07 12:06:42 - FEAT-005 - Implemented JSON export: Added export_to_json to StorageProvider and JsonStorage with tests.
+2025-05-07 12:06:42 - FEAT-005 - Implemented CLI ExportCommand with argparse, added to dispatcher. Tested success and StorageWriteError cases.
+2025-05-07 12:06:42 - FEAT-005 - Core export logic and CLI command implemented and tested. Next: Complete FEAT-005 checklist (status/log updates done, review DoD).

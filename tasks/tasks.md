@@ -197,17 +197,17 @@ Dependencies: FEAT-003
 ---
 
 ## FEAT-005: Export Data to JSON/CSV
-Status: Planned  
+Status: In Progress
 Priority: Medium  
 PRD Reference: @{docs/PRD.md}  
 Architectural Module: cli, infra/storage  
 Dependencies: FEAT-004
 
 ### 🔧 Implementation Plan
-- [ ] Implement export logic for JSON/CSV
-- [ ] Add CLI command for export
-- [ ] Write unit tests (happy path, file write errors)
-- [ ] Status/log updates
+- [x] Implement export logic for JSON/CSV
+- [x] Add CLI command for export
+- [x] Write unit tests (happy path, file write errors)
+- [x] Status/log updates
 
 ### ✅ Acceptance Criteria
 1. Data export works for all formats
