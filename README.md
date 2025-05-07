@@ -20,6 +20,21 @@ A simple CLI tool to track time spent on tasks.
     -   `tasks.md`: Detailed breakdown of tasks.
 -   `tests/`: Contains all unit and integration tests.
 
+## AI-Driven Development Process
+
+This project utilizes a structured, AI-assisted development process facilitated by an AI pair programmer (Gemini) operating within specific rules defined in `.cursorrules`. The core principles include:
+
+1.  **Task-Driven Workflow**: Development follows tasks defined in `tasks/tasks.md`. Each task has a clear checklist, acceptance criteria, and dependencies.
+2.  **Strict Test-Driven Development (TDD)**: For every implementation step within a task, the process mandates writing a *failing test first*, then writing the *minimal code* to pass the test, followed by *refactoring*. All tests must pass before proceeding.
+3.  **Git Flow**: All work is performed on dedicated feature branches (`feature/[TASK-ID]-[slug]`) checked out from `develop`. Branches are merged back into `develop` only after a task is fully complete and passes all checks.
+4.  **Context Management**: The AI relies heavily on project documentation (`docs/`, `tasks/`) to maintain context. Before starting any work, context is restored by referencing key documents like `status.md`, `tasks.md`, `technical.md`, etc. No code is written without sufficient context.
+5.  **Mode-Based Operation**: The AI operates in different modes (e.g., `TDD_ENFORCEMENT`, `PLANNER_MODE`, `DEBUGGER_MODE`) depending on the current situation, ensuring the correct procedures are followed.
+6.  **Definition of Done (DoD)**: Tasks are only marked complete after rigorously checking against a defined DoD checklist, which includes passing all tests, meeting acceptance criteria, code review, and merging the feature branch.
+7.  **Logging and Status Updates**: All significant actions, decisions, and task completions are logged with timestamps in `docs/log.md` and reflected in `docs/status.md`.
+8.  **Autonomous Execution with Guardrails**: The AI proceeds autonomously on clear, defined steps but is required to STOP and ask for clarification if instructions are ambiguous, architectural boundaries might be crossed, or context is insufficient.
+
+This disciplined approach aims to ensure high code quality, testability, maintainability, and clear traceability throughout the project's lifecycle.
+
 ## Getting Started
 
 ### Prerequisites
@@ -128,6 +143,7 @@ Code should be formatted with `black` and linted with `flake8`.
     PYTHONPATH=src flake8 --max-line-length=88 src/ tests/
     ```
     Alternatively, configure `max-line-length = 88` in a `.flake8` configuration file (see TECH-DEBT-001).
+
 
 ## Architecture Overview
 
