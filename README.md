@@ -22,11 +22,83 @@ A simple CLI tool to track time spent on tasks.
 
 ## Getting Started
 
-(To be added: instructions on how to install, run, and use the tool.)
+### Prerequisites
+
+- Python 3.9 or higher.
+
+### Installation
+
+1.  **Clone the repository:**
+    ```sh
+    git clone <repository-url>
+    cd task-timer
+    ```
+2.  **Running the tool:**
+    The tool can be run directly using the Python module execution:
+    ```sh
+    python -m src.main <command> [args...]
+    ```
+    For example:
+    ```sh
+    python -m src.main start "My new task"
+    python -m src.main status
+    ```
+    (Alternatively, a setup script could be created to install it as a system command, but that is not yet implemented.)
+
+### Basic Usage
+
+-   **Start a new task:**
+    ```sh
+    python -m src.main start "Task description here"
+    ```
+-   **Check current task status:**
+    ```sh
+    python -m src.main status
+    ```
+-   **Pause the current task:**
+    ```sh
+    python -m src.main pause
+    ```
+-   **Resume a paused task:**
+    ```sh
+    python -m src.main resume
+    ```
+-   **Stop the current task:**
+    ```sh
+    python -m src.main stop
+    ```
+-   **View task summary:**
+    ```sh
+    python -m src.main summary [today|this_week|this_month|this_year]
+    ```
+    (Defaults to 'today' if no period is specified)
+
+-   **Export task data:**
+    ```sh
+    python -m src.main export <format> <output_path>
+    ```
+    -   `<format>`: `json` or `csv`
+    -   `<output_path>`: File path to save the export (e.g., `my_tasks.json` or `my_tasks.csv`)
+    Example:
+    ```sh
+    python -m src.main export json ./tasks_export.json
+    python -m src.main export csv ./tasks_export.csv
+    ```
 
 ## Development
 
-(To be added: instructions on how to set up the development environment, run tests, and contribute.)
+### Setup
+
+1.  Follow the installation steps above to clone the repository.
+2.  It is recommended to use a virtual environment:
+    ```sh
+    python -m venv .venv
+    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+    ```
+3.  Install development dependencies (testing tools). While not yet in a `requirements-dev.txt`, you will need:
+    ```sh
+    pip install pytest pytest-cov freezegun flake8 black
+    ```
 
 ### Running Tests
 
@@ -46,7 +118,16 @@ PYTHONPATH=src pytest --cov=src tests/
 
 Code should be formatted with `black` and linted with `flake8`.
 
-(To be added: specific linting commands)
+-   **Format code with Black:**
+    ```sh
+    black src/ tests/
+    ```
+-   **Lint code with Flake8:**
+    (Ensure your `PYTHONPATH` is set to include the `src` directory if running from the project root, or if your IDE doesn't handle it automatically for imports.)
+    ```sh
+    PYTHONPATH=src flake8 --max-line-length=88 src/ tests/
+    ```
+    Alternatively, configure `max-line-length = 88` in a `.flake8` configuration file (see TECH-DEBT-001).
 
 ## Architecture Overview
 

@@ -53,3 +53,4 @@
 2025-05-07 12:06:42 - FEAT-005 - Implemented JSON export: Added export_to_json to StorageProvider and JsonStorage with tests.
 2025-05-07 12:06:42 - FEAT-005 - Implemented CLI ExportCommand with argparse, added to dispatcher. Tested success and StorageWriteError cases.
 2025-05-07 12:06:42 - FEAT-005 - Core export logic and CLI command implemented and tested. Next: Complete FEAT-005 checklist (status/log updates done, review DoD).
+2025-05-07 12:12:41 - DOCS - Updated README.md with Getting Started (Installation, Usage) and Development (Setup, Linting commands) sections.
