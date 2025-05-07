@@ -1,13 +1,12 @@
 from .command_base import Command
 from src.infra.storage.json_storage import JsonStorage
-from src.domain.summary import generate_summary_report, DATETIME_RANGE_HELPERS
-# from src.domain.session import TaskSession # For type hinting if needed - actually unused
+from src.domain.summary import generate_summary_report
 
 
 class SummaryCommand(Command):
     def execute(self, args: list[str]) -> None:
         storage = JsonStorage()
-        supported_periods = list(DATETIME_RANGE_HELPERS().keys())
+        supported_periods = ["today", "week", "month", "year"]
         period_name = "today"  # Default period
 
         if args:
@@ -16,7 +15,8 @@ class SummaryCommand(Command):
             else:
                 print(f"Error: Invalid period name '{args[0]}'.")
                 print(f"Supported periods are: {', '.join(supported_periods)}.")
-                print(f"Usage: task-timer summary [{'/'.join(supported_periods)}]")
+                usage_msg = f"Usage: task-timer summary [{'/'.join(supported_periods)}]"
+                print(usage_msg)
                 return
 
         print(f"Generating summary for period: {period_name}...")

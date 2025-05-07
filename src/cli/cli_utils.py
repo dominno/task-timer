@@ -34,14 +34,18 @@ def find_session_to_operate_on(
             if len(started_ones) == 1:
                 return started_ones[0]
             elif len(started_ones) > 1:
-                print(
-                    f"Error: Multiple RUNNING tasks found. Cannot reliably {action_verb}."
+                err_msg = (
+                    f"Error: Multiple RUNNING tasks found. "
+                    f"Cannot reliably {action_verb}."
                 )
+                print(err_msg)
                 return None
             else:  # Multiple PAUSED, or a mix that doesn't include a single STARTED
-                print(
-                    f"Error: Multiple active (PAUSED) tasks found. Cannot reliably {action_verb}."
+                err_msg = (
+                    f"Error: Multiple active (PAUSED) tasks found. "
+                    f"Cannot reliably {action_verb}."
                 )
+                print(err_msg)
                 return None
         return stoppable_sessions[0]  # Exactly one stoppable (STARTED or PAUSED)
 
@@ -53,30 +57,39 @@ def find_session_to_operate_on(
                 s for s in all_sessions if s.status == TaskSessionStatus.PAUSED
             ]
             if paused_sessions:
-                print(
-                    f"Error: Task '{paused_sessions[0].task_name}' is already PAUSED. Cannot {action_verb} again."
+                error_msg = (
+                    f"Error: Task '{paused_sessions[0].task_name}' is already PAUSED. "
+                    f"Cannot {action_verb} again."
                 )
+                print(error_msg)
             else:
-                print(f"Error: No task is currently RUNNING to {action_verb}.")
+                message = f"Error: No task is currently RUNNING to {action_verb}."  # noqa: E501
+                print(message)
         elif target_status == TaskSessionStatus.PAUSED:
             # Check if a STARTED one exists to give a more specific message for 'resume' action
             started_sessions = [
                 s for s in all_sessions if s.status == TaskSessionStatus.STARTED
             ]
             if started_sessions:
-                print(
-                    f"Error: Task '{started_sessions[0].task_name}' is already RUNNING. No task to {action_verb}."
+                error_msg = (
+                    f"Error: Task '{started_sessions[0].task_name}' is already RUNNING. "
+                    f"No task to {action_verb}."
                 )
+                print(error_msg)
             else:
-                print(f"Error: No task is currently PAUSED to {action_verb}.")
+                message = f"Error: No task is currently PAUSED to {action_verb}."  # noqa: E501
+                print(message)
         else:
-            print(f"Error: No task with status {target_status.value} to {action_verb}.")
+            message = f"Error: No task with status {target_status.value} to {action_verb}."  # noqa: E501
+            print(message)
         return None
 
     if len(candidate_sessions) > 1:
-        print(
-            f"Error: Multiple tasks found with status {target_status.value}. Cannot reliably {action_verb}."
+        error_msg = (
+            f"Error: Multiple tasks found with status {target_status.value}. "
+            f"Cannot reliably {action_verb}."
         )
+        print(error_msg)
         # TODO: Future enhancement - list tasks and allow selection.
         return None
 

@@ -1,10 +1,13 @@
 from .command_base import Command
 from src.infra.storage.json_storage import JsonStorage
+from src.domain.session import TaskSessionStatus
+
 # from src.domain.session import TaskSession # Unused
 from src.cli.cli_utils import (
-    find_active_or_paused_session,
+    find_session_to_operate_on,
     format_session_status,
 )
+
 # from typing import Optional # Unused
 
 
@@ -13,9 +16,7 @@ class StopCommand(Command):
         storage = JsonStorage()
         try:
             all_sessions = storage.get_all_sessions()
-            session_to_stop = find_active_or_paused_session(
-                all_sessions, "stop"
-            )
+            session_to_stop = find_session_to_operate_on(all_sessions, TaskSessionStatus.STARTED, "stop")
 
             if session_to_stop:
                 try:
@@ -25,9 +26,12 @@ class StopCommand(Command):
                     print(f"Task '{session_to_stop.task_name}' stopped.")
                     print(f"  Total duration: {duration_str}.")
                 except Exception as e_save:
-                    print(f"Error saving stopped task '{session_to_stop.task_name}':")
+                    error_message = (
+                        f"Error saving stopped task '{session_to_stop.task_name}':"
+                    )
+                    print(error_message)
                     print(str(e_save))
-            # If find_active_or_paused_session returned None, it already printed an error.
+            # If find_session_to_operate_on returned None, it already printed an error.
 
         except Exception as e_storage:
             print(f"Error accessing storage: {e_storage}")

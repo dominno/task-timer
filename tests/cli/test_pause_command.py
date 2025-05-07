@@ -162,8 +162,9 @@ def test_pause_command_domain_error(
         start_time=FROZEN_DATETIME - timedelta(minutes=5),
         status=TaskSessionStatus.STARTED,
     )
+    error_message = "Internal domain error on pause."
     active_session_causing_error.pause = mock.MagicMock(
-        side_effect=InvalidStateTransitionError("Internal domain error on pause.")
+        side_effect=InvalidStateTransitionError(error_message)
     )
     mock_storage_provider_pause.get_all_sessions.return_value = [
         active_session_causing_error
@@ -172,4 +173,4 @@ def test_pause_command_domain_error(
     command.execute([])
     mock_storage_provider_pause.save_task_session.assert_not_called()
     mock_print.assert_any_call("Error pausing task 'Error Task':")
-    mock_print.assert_any_call("Internal domain error on pause.")
+    mock_print.assert_any_call(error_message)

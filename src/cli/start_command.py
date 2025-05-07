@@ -26,9 +26,11 @@ class StartCommand(Command):
                     active_session_found = True
                     break
                 elif session.status == TaskSessionStatus.PAUSED:
-                    print(
-                        f"Error: Task '{session.task_name}' is PAUSED. Resume and stop, or stop it."
+                    error_msg = (
+                        f"Error: Task '{session.task_name}' is PAUSED. "
+                        f"Resume and stop, or stop it."
                     )
+                    print(error_msg)
                     active_session_found = True
                     break
         except Exception as e:

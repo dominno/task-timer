@@ -4,7 +4,6 @@ from datetime import timedelta
 # Import the command and dependent components
 from src.cli.summary_command import SummaryCommand
 from src.domain.session import TaskSession
-from src.domain.summary import DATETIME_RANGE_HELPERS
 
 
 def create_mock_session(task_name_value: str):
@@ -64,7 +63,7 @@ class TestSummaryCommand:
         mock_generate_report.return_value = mock_report_data
 
         command = SummaryCommand()
-        period_arg = "this_week"
+        period_arg = "week"
 
         # Act
         command.execute([period_arg])
@@ -75,7 +74,7 @@ class TestSummaryCommand:
         )
         print_calls = [call_args[0][0] for call_args in mock_print.call_args_list]
         assert f"Generating summary for period: {period_arg}..." in print_calls
-        assert "\n--- Summary for This Week ---" in print_calls
+        assert f"\n--- Summary for {period_arg.title()} ---" in print_calls
         assert "- Task: TASK-WEEK: 45m 10s" in print_calls
 
     @mock.patch("src.cli.summary_command.JsonStorage")
@@ -84,23 +83,17 @@ class TestSummaryCommand:
         # Arrange
         command = SummaryCommand()
         invalid_period_arg = "invalid_period"
-        supported_periods = list(DATETIME_RANGE_HELPERS().keys())
+        supported_periods = ["today", "week", "month", "year"]
 
         # Act
         command.execute([invalid_period_arg])
 
         # Assert
         print_calls = [call_args[0][0] for call_args in mock_print.call_args_list]
+        assert f"Error: Invalid period name '{invalid_period_arg}'." in print_calls
+        assert f"Supported periods are: {', '.join(supported_periods)}." in print_calls
         assert (
-            f"Error: Invalid period name '{invalid_period_arg}'." in print_calls
-        )
-        assert (
-            f"Supported periods are: {', '.join(supported_periods)}."
-            in print_calls
-        )
-        assert (
-            f"Usage: task-timer summary [{'/'.join(supported_periods)}]"
-            in print_calls
+            f"Usage: task-timer summary [{'/'.join(supported_periods)}]" in print_calls
         )
 
     @mock.patch("src.cli.summary_command.JsonStorage")
@@ -141,7 +134,7 @@ class TestSummaryCommand:
         mock_generate_report.return_value = {}  # Empty report
 
         command = SummaryCommand()
-        period_arg = "this_month"
+        period_arg = "month"
 
         # Act
         command.execute([period_arg])
@@ -170,12 +163,9 @@ class TestSummaryCommand:
 
         # Assert
         print_calls = [call_args[0][0] for call_args in mock_print.call_args_list]
+        assert "Generating summary for period: today..." in print_calls
         assert (
-            "Generating summary for period: today..." in print_calls
-        )
-        assert (
-            "No tasks have been recorded yet (storage file not found)."
-            in print_calls
+            "No tasks have been recorded yet (storage file not found)." in print_calls
         )
 
     @mock.patch("src.cli.summary_command.JsonStorage")

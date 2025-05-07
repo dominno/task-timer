@@ -1,7 +1,7 @@
 # Placeholder for TaskSession entity and logic
 
 from enum import Enum
-from datetime import datetime, timedelta, timezone
+import datetime as dt
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -26,18 +26,18 @@ class TaskSession:
 
     Attributes:
         task_name (str): The name or description of the task.
-        start_time (datetime): The overall start time when the session was created.
-        end_time (Optional[datetime]): The overall end time when the session was
+        start_time (dt.datetime): The overall start time when the session was created.
+        end_time (Optional[dt.datetime]): The overall end time when the session was
                                      stopped. None if ongoing or paused.
         status (TaskSessionStatus): The current status of the session (STARTED,
                                   PAUSED, STOPPED).
-        _accumulated_duration (timedelta): Internal: Stores duration from
+        _accumulated_duration (dt.timedelta): Internal: Stores duration from
                                          completed segments.
-        _current_segment_start_time (Optional[datetime]): Internal: Time current
+        _current_segment_start_time (Optional[dt.datetime]): Internal: Time current
                                                        active segment started, or None.
-        _pause_times: list[datetime] = field(default_factory=list, init=False)
-        _resume_times: list[datetime] = field(default_factory=list, init=False)
-        duration (timedelta): Calculated total active duration of the session.
+        _pause_times: list[dt.datetime] = field(default_factory=list, init=False)
+        _resume_times: list[dt.datetime] = field(default_factory=list, init=False)
+        duration (dt.timedelta): Calculated total active duration of the session.
 
     State Transitions (managed by lifecycle methods):
         - A new session starts in STARTED status.
@@ -48,39 +48,41 @@ class TaskSession:
     """
 
     task_name: str
-    start_time: datetime
-    end_time: Optional[datetime] = None
+    start_time: dt.datetime
+    end_time: Optional[dt.datetime] = None
     status: TaskSessionStatus = TaskSessionStatus.STARTED
 
     # Internal fields for accurate duration calculation across pauses/resumes
-    _accumulated_duration: timedelta = field(init=False, default_factory=timedelta)
+    _accumulated_duration: dt.timedelta = field(
+        init=False, default_factory=dt.timedelta
+    )
     # Stores total duration of completed segments (when paused/stopped).
 
-    _current_segment_start_time: Optional[datetime] = field(init=False)
+    _current_segment_start_time: Optional[dt.datetime] = field(init=False)
     # If task is STARTED, marks beginning of current active segment.
 
     # To reconstruct segments for reporting or detailed logs
-    _pause_times: list[datetime] = field(init=False, default_factory=list)
-    _resume_times: list[datetime] = field(default_factory=list, init=False)
+    _pause_times: list[dt.datetime] = field(init=False, default_factory=list)
+    _resume_times: list[dt.datetime] = field(default_factory=list, init=False)
 
     def __post_init__(self):
-        if not isinstance(self.start_time, datetime):
+        if not isinstance(self.start_time, dt.datetime):
             raise TypeError("start_time must be a datetime object")
 
         # Normalize start_time to UTC
         if self.start_time.tzinfo is None:  # If naive, assume UTC
-            self.start_time = self.start_time.replace(tzinfo=timezone.utc)
-        elif self.start_time.tzinfo != timezone.utc:  # If aware but not UTC, convert
-            self.start_time = self.start_time.astimezone(timezone.utc)
+            self.start_time = self.start_time.replace(tzinfo=dt.timezone.utc)
+        elif self.start_time.tzinfo != dt.timezone.utc:  # If aware but not UTC, convert
+            self.start_time = self.start_time.astimezone(dt.timezone.utc)
 
         if self.end_time is not None:
-            if not isinstance(self.end_time, datetime):
+            if not isinstance(self.end_time, dt.datetime):
                 raise TypeError("end_time must be a datetime object or None")
             # Normalize end_time to UTC
             if self.end_time.tzinfo is None:
-                self.end_time = self.end_time.replace(tzinfo=timezone.utc)
-            elif self.end_time.tzinfo != timezone.utc:
-                self.end_time = self.end_time.astimezone(timezone.utc)
+                self.end_time = self.end_time.replace(tzinfo=dt.timezone.utc)
+            elif self.end_time.tzinfo != dt.timezone.utc:
+                self.end_time = self.end_time.astimezone(dt.timezone.utc)
 
         if self.status == TaskSessionStatus.STARTED:
             self._current_segment_start_time = self.start_time  # Now guaranteed UTC
@@ -93,12 +95,12 @@ class TaskSession:
             self._current_segment_start_time = None
 
     @property
-    def duration(self) -> timedelta:
+    def duration(self) -> dt.timedelta:
         """Calculates the total active duration of the task session."""
         # Assumes if STARTED, `now` is current time.
         # For PAUSED/STOPPED, duration is fixed.
         # Accumulation happens in pause() and stop() methods.
-        now = datetime.now(timezone.utc)
+        now = dt.datetime.now(dt.timezone.utc)
         current_duration = self._accumulated_duration
         if (
             self.status == TaskSessionStatus.STARTED
@@ -122,7 +124,7 @@ class TaskSession:
             self.status == TaskSessionStatus.STARTED
             and self._current_segment_start_time
         ):
-            now = datetime.now(timezone.utc)
+            now = dt.datetime.now(dt.timezone.utc)
             # _current_segment_start_time is now guaranteed to be UTC
             self._accumulated_duration += now - self._current_segment_start_time
 
@@ -141,7 +143,7 @@ class TaskSession:
                 "Cannot resume a session that is already STOPPED."
             )
 
-        now = datetime.now(timezone.utc)
+        now = dt.datetime.now(dt.timezone.utc)
         self._resume_times.append(now)  # Record resume time
         self.status = TaskSessionStatus.STARTED
         self._current_segment_start_time = now  # This is UTC
@@ -153,7 +155,7 @@ class TaskSession:
                 "Cannot stop a session that is already STOPPED."
             )
 
-        now = datetime.now(timezone.utc)
+        now = dt.datetime.now(dt.timezone.utc)
 
         if (
             self.status == TaskSessionStatus.STARTED
@@ -166,9 +168,9 @@ class TaskSession:
         self.status = TaskSessionStatus.STOPPED
         self._current_segment_start_time = None
 
-    def get_active_segments(self) -> list[tuple[datetime, datetime]]:
+    def get_active_segments(self) -> list[tuple[dt.datetime, dt.datetime]]:
         """Reconstructs and returns a list of [start, end] tuples for active segments."""
-        segments: list[tuple[datetime, datetime]] = []
+        segments: list[tuple[dt.datetime, dt.datetime]] = []
         if not self.start_time:
             return segments  # Should not happen for a valid session
 
@@ -181,7 +183,7 @@ class TaskSession:
             pause_time = self._pause_times[i]
             if (
                 current_segment_start < pause_time
-            ):  # Ensure segment has positive duration
+            ):  # Ensure segment has positive duration  # noqa: E501
                 segments.append((current_segment_start, pause_time))
 
             if i < num_resumes:
@@ -199,7 +201,8 @@ class TaskSession:
                 # Currently running: segment is from last resume (or start_time) to now
                 # Use a consistent "now" for this calculation if called multiple times rapidly
                 # but for segment definition, datetime.now is fine.
-                segments.append((current_segment_start, datetime.now(timezone.utc)))
+                now_for_segment = dt.datetime.now(dt.timezone.utc)
+                segments.append((current_segment_start, now_for_segment))
             elif self.status == TaskSessionStatus.STOPPED and self.end_time:
                 # Stopped: segment is from last resume (or start_time) to end_time
                 if current_segment_start < self.end_time:

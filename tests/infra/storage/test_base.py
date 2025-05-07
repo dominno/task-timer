@@ -1,5 +1,6 @@
 import pytest
 from abc import ABC
+from typing import Any, List
 
 # Attempt to import the StorageProvider
 try:
@@ -12,13 +13,19 @@ except ImportError:
 
 # A concrete implementation for testing purposes
 class ConcreteStorageProvider(StorageProvider):
-    def save_task_session(self, session: TaskSession) -> None:
+    def save_task_session(self, session: Any) -> None:
         pass
 
-    def get_all_sessions(self) -> list[TaskSession]:  # Use list[TaskSession]
+    def get_all_sessions(self) -> List[Any]:
         return []
 
     def clear(self) -> None:
+        pass
+
+    def export_to_csv(self, target_path: str) -> None:
+        pass
+
+    def export_to_json(self, target_path: str) -> None:
         pass
 
 
@@ -49,7 +56,13 @@ def test_storage_provider_cannot_be_instantiated_directly():
 )
 def test_storage_provider_has_abstract_methods():
     """Tests that StorageProvider declares the required abstract methods."""
-    expected_abstract_methods = {"save_task_session", "get_all_sessions", "clear"}
+    expected_abstract_methods = {
+        "save_task_session",
+        "get_all_sessions",
+        "clear",
+        "export_to_csv",
+        "export_to_json",
+    }
     actual_abstract_methods = StorageProvider.__abstractmethods__
     assert actual_abstract_methods == expected_abstract_methods, (
         f"Expected abstract methods {expected_abstract_methods}, "

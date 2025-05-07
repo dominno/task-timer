@@ -24,7 +24,7 @@ def manage_export_test_dir():
     # Teardown: Remove all files in EXPORT_TEST_DIR after tests in this module run
     # for f_name in os.listdir(EXPORT_TEST_DIR):
     #     os.remove(os.path.join(EXPORT_TEST_DIR, f_name))
-    # os.rmdir(EXPORT_TEST_DIR) # This might fail if a test creates subdirs or fails mid-file-creation
+    # os.rmdir(EXPORT_TEST_DIR) # Might fail if test creates subdirs/fails mid-creation
     # A more robust cleanup might be needed if tests are complex, for now, this is a start
     # For simplicity, manual cleanup or git clean might be easier initially than robust pytest teardown here.
 
@@ -33,9 +33,10 @@ def manage_export_test_dir():
     ExportCommand is None or JsonStorage is None, reason="Dependencies not met"
 )
 @mock.patch("builtins.print")
-@mock.patch(
-    "src.cli.export_command.JsonStorage"
-)  # Mock the storage instance used by the command
+@mock.patch(  # noqa: E501
+    "src.cli.export_command.JsonStorage"  # noqa: E501
+    # Mock the storage instance used by the command
+)
 def test_export_command_json_successful(mock_json_storage_class, mock_print):
     """Test ExportCommand for JSON successfully calls storage.export_to_json."""
     mock_storage_instance = mock.MagicMock(spec=JsonStorage)
@@ -56,7 +57,10 @@ def test_export_command_json_successful(mock_json_storage_class, mock_print):
     ExportCommand is None or JsonStorage is None, reason="Dependencies not met"
 )
 @mock.patch("builtins.print")
-@mock.patch("src.cli.export_command.JsonStorage")
+@mock.patch(  # noqa: E501
+    "src.cli.export_command.JsonStorage"  # noqa: E501
+    # Mock the storage instance used by the command
+)
 def test_export_command_csv_successful(mock_json_storage_class, mock_print):
     """Test ExportCommand for CSV successfully calls storage.export_to_csv."""
     mock_storage_instance = mock.MagicMock(spec=JsonStorage)
@@ -78,7 +82,10 @@ def test_export_command_csv_successful(mock_json_storage_class, mock_print):
     reason="Dependencies not met",
 )
 @mock.patch("builtins.print")
-@mock.patch("src.cli.export_command.JsonStorage")
+@mock.patch(  # noqa: E501
+    "src.cli.export_command.JsonStorage"  # noqa: E501
+    # Mock the storage instance used by the command
+)
 def test_export_command_storage_write_error(mock_json_storage_class, mock_print):
     """Test ExportCommand handles StorageWriteError during export."""
     mock_storage_instance = mock.MagicMock(spec=JsonStorage)

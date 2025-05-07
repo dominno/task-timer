@@ -246,12 +246,9 @@ def test_export_to_csv_successful(temp_json_storage):
     # For now, to simplify test assertion, let's get its state as it would be written.
     # The actual export_to_csv in JsonStorage will just call get_all_sessions(),
     # which returns the sessions. If a session is RUNNING, its duration is live.
-    # This means the CSV content for a running task could change if generated at different times.
+    # CSV content for a running task could change if generated at different times.
     # This is an important consideration for the design of export for live data.
-    # For this test, let's assume export captures a snapshot.
-    # We will mock datetime.now() if needed within the export_to_csv or use freezegun around its call if critical.
-    # For now, let's just generate the row for session2 based on its current (live) state.
-    expected_rows.append(task_session_to_csv_row(session2))
+    expected_rows.append(task_session_to_csv_row(session2))  # Add session2 as is
 
     with open(export_csv_path, "r", newline="") as f:
         reader = csv.reader(f)

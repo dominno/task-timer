@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-from typing import Callable, Tuple
 from collections import defaultdict
 
 # Import the actual TaskSession
@@ -10,69 +9,84 @@ TIME_START_OF_DAY = datetime.min.time()  # 00:00:00
 TIME_END_OF_DAY = datetime.max.time()  # 23:59:59.999999
 
 
-def get_today_range() -> Tuple[datetime, datetime]:
-    """Returns a tuple of (start_of_today, end_of_today) in UTC."""
-    today_utc = datetime.now(timezone.utc).date()
-    start_of_today = datetime.combine(today_utc, TIME_START_OF_DAY, tzinfo=timezone.utc)
-    end_of_today = datetime.combine(today_utc, TIME_END_OF_DAY, tzinfo=timezone.utc)
-    return start_of_today, end_of_today
-
-
-def get_this_week_range() -> Tuple[datetime, datetime]:
-    """Returns a tuple of (start_of_week, end_of_week) in UTC.
-    Week starts on Monday and ends on Sunday.
+def get_date_range_for_period(period_name: str) -> tuple[datetime, datetime]:
     """
-    today_utc_date = datetime.now(timezone.utc).date()
-    start_of_week_date = today_utc_date - timedelta(
-        days=today_utc_date.weekday()
-    )  # Monday
-    end_of_week_date = start_of_week_date + timedelta(days=6)  # Sunday
+    Returns the start and end datetimes for a given named period.
+    All datetimes are timezone-aware (UTC).
+    """
+    now_utc = datetime.now(timezone.utc)
 
-    start_of_week = datetime.combine(
-        start_of_week_date, TIME_START_OF_DAY, tzinfo=timezone.utc
-    )
-    end_of_week = datetime.combine(
-        end_of_week_date, TIME_END_OF_DAY, tzinfo=timezone.utc
-    )
-    return start_of_week, end_of_week
+    if period_name == "today":
+        start_of_day = datetime(
+            now_utc.year, now_utc.month, now_utc.day, 0, 0, 0, 0, tzinfo=timezone.utc
+        )
+        end_of_day = datetime(
+            now_utc.year,
+            now_utc.month,
+            now_utc.day,
+            23,
+            59,
+            59,
+            999999,
+            tzinfo=timezone.utc,
+        )
+        return start_of_day, end_of_day
+    elif period_name == "week":
+        start_of_week_date = now_utc - timedelta(days=now_utc.weekday())  # Monday
+        start_of_week = datetime(
+            start_of_week_date.year,
+            start_of_week_date.month,
+            start_of_week_date.day,
+            0,
+            0,
+            0,
+            0,
+            tzinfo=timezone.utc,
+        )
+        end_of_week_date = start_of_week_date + timedelta(days=6)  # Sunday
+        end_of_week = datetime(
+            end_of_week_date.year,
+            end_of_week_date.month,
+            end_of_week_date.day,
+            23,
+            59,
+            59,
+            999999,
+            tzinfo=timezone.utc,
+        )
+        return start_of_week, end_of_week
+    elif period_name == "month":
+        start_of_month = datetime(
+            now_utc.year, now_utc.month, 1, 0, 0, 0, 0, tzinfo=timezone.utc
+        )
+        # Calculate end of month robustly
+        if now_utc.month == 12:
+            end_of_month_day = datetime(now_utc.year, 12, 31)
+        else:
+            end_of_month_day = datetime(now_utc.year, now_utc.month + 1, 1) - timedelta(
+                days=1
+            )
+        end_of_month = datetime(
+            end_of_month_day.year,
+            end_of_month_day.month,
+            end_of_month_day.day,
+            23,
+            59,
+            59,
+            999999,
+            tzinfo=timezone.utc,
+        )
+        return start_of_month, end_of_month
+    elif period_name == "year":
+        start_of_year = datetime(now_utc.year, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
+        end_of_year = datetime(
+            now_utc.year, 12, 31, 23, 59, 59, 999999, tzinfo=timezone.utc
+        )
+        return start_of_year, end_of_year
+    else:
+        raise ValueError(f"Invalid period specified: {period_name}")
 
 
-def get_this_month_range() -> Tuple[datetime, datetime]:
-    """Returns a tuple of (start_of_month, end_of_month) in UTC."""
-    today_utc_date = datetime.now(timezone.utc).date()
-    start_of_month_date = today_utc_date.replace(day=1)
-
-    # Calculate end of month
-    next_month = start_of_month_date.replace(day=28) + timedelta(
-        days=4
-    )  # Go to next month safely
-    end_of_month_date = next_month - timedelta(days=next_month.day)
-
-    start_of_month = datetime.combine(
-        start_of_month_date, TIME_START_OF_DAY, tzinfo=timezone.utc
-    )
-    end_of_month = datetime.combine(
-        end_of_month_date, TIME_END_OF_DAY, tzinfo=timezone.utc
-    )
-    return start_of_month, end_of_month
-
-
-def get_this_year_range() -> Tuple[datetime, datetime]:
-    """Returns a tuple of (start_of_year, end_of_year) in UTC."""
-    today_utc_date = datetime.now(timezone.utc).date()
-    start_of_year_date = today_utc_date.replace(month=1, day=1)
-    end_of_year_date = today_utc_date.replace(month=12, day=31)
-
-    start_of_year = datetime.combine(
-        start_of_year_date, TIME_START_OF_DAY, tzinfo=timezone.utc
-    )
-    end_of_year = datetime.combine(
-        end_of_year_date, TIME_END_OF_DAY, tzinfo=timezone.utc
-    )
-    return start_of_year, end_of_year
-
-
-# TODO: Implement these functions next:
 def get_duration_within_period(
     session: TaskSession, period_start: datetime, period_end: datetime
 ) -> timedelta:
@@ -81,64 +95,51 @@ def get_duration_within_period(
     active_segments = session.get_active_segments()
 
     for seg_start, seg_end in active_segments:
-        # Ensure all datetimes are UTC for comparison, assuming period_start/end are UTC
-        # Segments from get_active_segments should already be UTC
-
         overlap_start = max(seg_start, period_start)
         overlap_end = min(seg_end, period_end)
 
-        if overlap_start < overlap_end:  # If there is an actual overlap
+        if overlap_start < overlap_end:
             total_duration_in_period += overlap_end - overlap_start
 
     return total_duration_in_period
-
-
-def DATETIME_RANGE_HELPERS() -> dict[str, Callable[[], tuple[datetime, datetime]]]:
-    return {
-        "today": get_today_range,
-        "this_week": get_this_week_range,
-        "this_month": get_this_month_range,
-        "this_year": get_this_year_range,
-    }
 
 
 def generate_summary_report(
     sessions: list[TaskSession], period_name: str
 ) -> dict[str, timedelta]:
     """
-    Generates a summary report of total time spent per task_id within a given named period.
+    Generates a summary report of total time spent per task_name within a given named period.
 
     Args:
         sessions: A list of TaskSession objects.
-        period_name: The name of the period (e.g., "today", "this_week").
+        period_name: The name of the period (e.g., "today", "week", "month", "year").
 
     Returns:
-        A dictionary mapping task_id (str) to total duration (timedelta) spent on that task
+        A dictionary mapping task_name (str) to total duration (timedelta) spent on that task
         within the specified period.
-        Returns an empty dictionary if the period_name is invalid.
+        Raises ValueError if the period_name is invalid.
     """
-    range_helpers = DATETIME_RANGE_HELPERS()
-    if period_name not in range_helpers:
-        # Or raise an error, or log a warning, depending on desired behavior
-        return {}
-
-    period_start, period_end = range_helpers[period_name]()
+    try:
+        period_start, period_end = get_date_range_for_period(period_name)
+    except ValueError:
+        # Re-raise or handle as per desired application flow. For now, re-raise.
+        # Or, to match previous behavior of returning empty dict for invalid period:
+        # print(f"Warning: Invalid period_name '{period_name}' for summary report.")
+        # return {}
+        raise  # Re-raise the ValueError from get_date_range_for_period
 
     summary_data: dict[str, timedelta] = defaultdict(timedelta)
 
     for session in sessions:
-        if not session.task_name:  # Changed from task_id to task_name
+        if not session.task_name:
             continue
         duration_in_period = get_duration_within_period(
             session, period_start, period_end
         )
         if duration_in_period > timedelta(0):
-            summary_data[
-                session.task_name
-            ] += duration_in_period  # Changed from task_id to task_name
+            summary_data[session.task_name] += duration_in_period
 
-    return dict(summary_data)  # Convert back to dict if using defaultdict internally
+    return dict(summary_data)
 
 
-# def generate_summary_report(all_sessions: List[TaskSession], report_period_start: datetime, report_period_end: datetime) -> Dict[str, timedelta]:
 #     pass

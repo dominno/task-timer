@@ -22,7 +22,7 @@ class ExportCommand(Command):
             parsed_args = parser.parse_args(args)
         except (
             SystemExit
-        ):  # argparse exits on error, catch to prevent stopping the main app if used interactively
+        ):  # argparse exits on error, catch to prevent stopping the main app if used interactively  # noqa: E501
             return
 
         storage = JsonStorage()

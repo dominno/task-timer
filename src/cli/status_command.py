@@ -1,7 +1,6 @@
 from .command_base import Command
 from src.infra.storage.json_storage import JsonStorage
 from src.domain.session import TaskSession, TaskSessionStatus
-from typing import list
 from .cli_utils import format_timedelta_for_cli
 
 
